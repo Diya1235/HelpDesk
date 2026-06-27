@@ -5,6 +5,7 @@ import { db } from "../db";
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
   emailAndPassword: { enabled: true, disableSignUp: true },
+  trustedOrigins: [process.env["FRONTEND_URL"] ?? "http://localhost:5173"],
   user: {
     additionalFields: {
       role: {
