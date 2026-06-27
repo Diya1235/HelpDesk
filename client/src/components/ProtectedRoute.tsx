@@ -5,7 +5,11 @@ export function ProtectedRoute() {
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
-    return <div className="loading-screen">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+        Loading...
+      </div>
+    );
   }
 
   if (!session) {
