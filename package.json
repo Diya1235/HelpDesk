@@ -1,0 +1,10 @@
+{
+  "name": "helpdesk",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "typecheck": "bun run --filter '*' typecheck"
+  }
+}
