@@ -5,9 +5,14 @@
     "dev": "bun run --watch src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
     "start": "bun run dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:push": "prisma db push"
   },
   "dependencies": {
+    "@prisma/client": "6.19.2",
     "cors": "^2.8.5",
     "express": "^5.1.0"
   },
@@ -15,6 +20,7 @@
     "@types/bun": "latest",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "prisma": "6.19.2",
     "typescript": "^5"
   }
 }
