@@ -16,6 +16,7 @@ model user {
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
+  role          Role      @default(agent)
   sessions      session[]
   accounts      account[]
 }
@@ -47,6 +48,11 @@ model account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+}
+
+enum Role {
+  admin
+  agent
 }
 
 model verification {
