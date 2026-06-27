@@ -4,6 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { authClient } from "../lib/auth-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -42,63 +45,62 @@ export function LoginPage() {
     }
   };
 
-  const inputBase =
-    "w-full border rounded-md px-3 py-2 text-sm text-gray-900 outline-none transition focus:ring-2";
-  const inputNormal = "border-gray-300 focus:border-blue-600 focus:ring-blue-500/10";
-  const inputError = "border-red-500 focus:border-red-500 focus:ring-red-500/10";
-
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white border border-gray-200 rounded-xl shadow-md w-full max-w-sm px-8 py-9">
-        <h1 className="text-xl font-bold text-gray-900 mb-6">
-          Sign in to Helpdesk
-        </h1>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="text-[0.8125rem] font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="xyz@gmail.com"
-              className={`${inputBase} ${errors.email ? inputError : inputNormal}`}
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-[0.8125rem] text-red-600">{errors.email.message}</p>
-            )}
+    <div className="min-h-screen flex items-center justify-center bg-muted p-4">
+      <div className="w-full max-w-sm">
+        <div className="rounded-xl border border-border bg-card px-8 py-9 shadow-sm">
+          <div className="mb-6">
+            <h1 className="text-xl font-semibold text-foreground">Sign in</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Enter your credentials to continue
+            </p>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label htmlFor="password" className="text-[0.8125rem] font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              className={`${inputBase} ${errors.password ? inputError : inputNormal}`}
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-[0.8125rem] text-red-600">{errors.password.message}</p>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="name@example.com"
+                aria-invalid={!!errors.email}
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                aria-invalid={!!errors.password}
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password.message}</p>
+              )}
+            </div>
+
+            {serverError && (
+              <p className="text-xs text-destructive">{serverError}</p>
             )}
-          </div>
 
-          {serverError && (
-            <p className="text-[0.8125rem] text-red-600">{serverError}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md py-2.5 px-4 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-2"
-          >
-            {isSubmitting ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
+            <Button
+              type="submit"
+              size="lg"
+              className="mt-2 w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Signing in…" : "Sign in"}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );

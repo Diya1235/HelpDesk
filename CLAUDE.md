@@ -62,7 +62,22 @@ docker compose down         # stop and remove containers
 ## Architecture
 
 ### Authentication
-Session-based auth with sessions persisted in PostgreSQL (not in-memory). Middleware guards all routes and enforces role (`admin` | `agent`). Unauthenticated requests redirect to `/login`.
+**Library:** Better Auth v1.6.22 with Prisma adapter.
+
+**Server files:**
+- Config: `server/src/lib/auth.ts` — email/password enabled, Prisma adapter using `server/src/db.ts`
+- Route: mounted at `/api/auth/*` in `server/src/index.ts` via `toNodeHandler(auth)`
+- Prisma models: `user`, `session`, `account`, `verification` in `server/prisma/schema.prisma`
+
+**Client files:**
+- Client: `client/src/lib/auth-client.ts` — `createAuthClient()` pointed at the server
+- Session hook: `authClient.useSession()` — use this everywhere to read the current user
+- Sign in: `authClient.signIn.email({ email, password })`
+- Sign out: `authClient.signOut()`
+
+**Env vars required:** `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (in root `.env`)
+
+Sessions are persisted in PostgreSQL (not in-memory). Middleware guards all routes and enforces role (`admin` | `agent`). Unauthenticated requests redirect to `/login`.
 
 ### Role-Based Access
 - Admin: full access including agent CRUD (`/admin/*` routes)
