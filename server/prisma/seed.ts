@@ -4,7 +4,11 @@ import { db } from "../src/db";
 import { Role } from "../src/generated/prisma";
 
 const email = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
-const password = process.env.SEED_ADMIN_PASSWORD ?? "password123";
+const password = process.env.SEED_ADMIN_PASSWORD;
+if (!password) {
+  console.error("FATAL: SEED_ADMIN_PASSWORD environment variable is required");
+  process.exit(1);
+}
 
 // Separate instance without disableSignUp so we can create the user
 const seedAuth = betterAuth({

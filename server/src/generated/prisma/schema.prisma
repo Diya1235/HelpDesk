@@ -8,6 +8,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  admin
+  agent
+}
+
 model user {
   id            String    @id
   name          String
@@ -48,11 +53,6 @@ model account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
-}
-
-enum Role {
-  admin
-  agent
 }
 
 model verification {

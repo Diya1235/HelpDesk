@@ -10,13 +10,16 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
-    "db:seed": "bun run --env-file=../.env prisma/seed.ts"
+    "db:seed": "bun run --env-file=../.env prisma/seed.ts",
+    "dev:test": "bun run --env-file=../.env.test --watch src/index.ts",
+    "db:seed:test": "bun run --env-file=../.env.test prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.2",
     "better-auth": "^1.6.22",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.5.2"
   },
   "devDependencies": {
     "@types/bun": "latest",

@@ -6,3 +6,7 @@ dist/
 .DS_Store
 client/dist/
 server/dist/
+
+# Playwright
+/playwright-report/
+/test-results/

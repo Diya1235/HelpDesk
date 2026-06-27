@@ -27,6 +27,7 @@ export function Navbar() {
         )}
       </div>
       <div className="flex items-center gap-4">
+
         <span className="text-sm font-medium text-gray-500">
           {session?.user.name}
         </span>
