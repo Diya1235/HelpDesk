@@ -65,6 +65,10 @@ function mockGetSuccess(ticketOverride = {}) {
   });
 }
 
+const assignedToSelect = () => screen.getByRole("combobox", { name: /assigned to/i });
+const statusSelect = () => screen.getByRole("combobox", { name: /status/i });
+const categorySelect = () => screen.getByRole("combobox", { name: /category/i });
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -100,13 +104,6 @@ describe("TicketDetailPage", () => {
       await screen.findByText("Can't log in");
     });
 
-    it("renders the status badge", async () => {
-      renderPage();
-      await screen.findByText("Can't log in");
-
-      expect(screen.getByText("Open")).toBeInTheDocument();
-    });
-
     it("renders the sender name and email", async () => {
       renderPage();
       await screen.findByText("Can't log in");
@@ -138,6 +135,123 @@ describe("TicketDetailPage", () => {
     });
   });
 
+  describe("status dropdown", () => {
+    beforeEach(() => {
+      mockGetSuccess();
+    });
+
+    it("shows the current status as the selected option", async () => {
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      expect(statusSelect()).toHaveValue("Open");
+    });
+
+    it("lists all status options", async () => {
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      expect(screen.getByRole("option", { name: "Open" })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "Resolved" })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "Closed" })).toBeInTheDocument();
+    });
+
+    it("calls PATCH /api/tickets/1 with the new status", async () => {
+      vi.mocked(axios.patch).mockResolvedValue({
+        data: { ...TICKET, status: "Resolved" },
+      });
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      await userEvent.selectOptions(statusSelect(), "Resolved");
+
+      await waitFor(() =>
+        expect(axios.patch).toHaveBeenCalledWith("/api/tickets/1", { status: "Resolved" })
+      );
+    });
+
+    it("disables the dropdown while the mutation is pending", async () => {
+      vi.mocked(axios.patch).mockReturnValue(new Promise(() => {}));
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      await userEvent.selectOptions(statusSelect(), "Closed");
+
+      expect(statusSelect()).toBeDisabled();
+    });
+
+    it("updates the selected value after a successful status change", async () => {
+      vi.mocked(axios.patch).mockResolvedValue({
+        data: { ...TICKET, status: "Closed" },
+      });
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      await userEvent.selectOptions(statusSelect(), "Closed");
+
+      await waitFor(() => expect(statusSelect()).toHaveValue("Closed"));
+    });
+  });
+
+  describe("category dropdown", () => {
+    beforeEach(() => {
+      mockGetSuccess();
+    });
+
+    it("shows the current category as the selected option", async () => {
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      expect(categorySelect()).toHaveValue("TechnicalQuestion");
+    });
+
+    it("shows 'Uncategorised' when category is null", async () => {
+      mockGetSuccess({ category: null });
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      expect(categorySelect()).toHaveValue("");
+    });
+
+    it("calls PATCH /api/tickets/1 with the new category", async () => {
+      vi.mocked(axios.patch).mockResolvedValue({
+        data: { ...TICKET, category: "RefundRequest" },
+      });
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      await userEvent.selectOptions(categorySelect(), "RefundRequest");
+
+      await waitFor(() =>
+        expect(axios.patch).toHaveBeenCalledWith("/api/tickets/1", { category: "RefundRequest" })
+      );
+    });
+
+    it("calls PATCH with null when 'Uncategorised' is selected", async () => {
+      vi.mocked(axios.patch).mockResolvedValue({
+        data: { ...TICKET, category: null },
+      });
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      await userEvent.selectOptions(categorySelect(), "");
+
+      await waitFor(() =>
+        expect(axios.patch).toHaveBeenCalledWith("/api/tickets/1", { category: null })
+      );
+    });
+
+    it("also disables category dropdown while mutation is pending", async () => {
+      vi.mocked(axios.patch).mockReturnValue(new Promise(() => {}));
+      renderPage();
+      await screen.findByText("Can't log in");
+
+      await userEvent.selectOptions(categorySelect(), "GeneralQuestion");
+
+      expect(categorySelect()).toBeDisabled();
+    });
+  });
+
   describe("assignment dropdown", () => {
     beforeEach(() => {
       mockGetSuccess();
@@ -155,7 +269,7 @@ describe("TicketDetailPage", () => {
       renderPage();
       await screen.findByText("Can't log in");
 
-      expect(screen.getByRole("combobox")).toHaveValue("");
+      expect(assignedToSelect()).toHaveValue("");
     });
 
     it("selects the current assignee in the dropdown", async () => {
@@ -163,7 +277,7 @@ describe("TicketDetailPage", () => {
       renderPage();
       await screen.findByText("Can't log in");
 
-      expect(screen.getByRole("combobox")).toHaveValue("agent-1");
+      expect(assignedToSelect()).toHaveValue("agent-1");
     });
 
     it("calls PATCH /api/tickets/1/assign with the selected agent id", async () => {
@@ -173,7 +287,7 @@ describe("TicketDetailPage", () => {
       renderPage();
       await screen.findByText("Can't log in");
 
-      await userEvent.selectOptions(screen.getByRole("combobox"), "agent-1");
+      await userEvent.selectOptions(assignedToSelect(), "agent-1");
 
       await waitFor(() =>
         expect(axios.patch).toHaveBeenCalledWith("/api/tickets/1/assign", {
@@ -190,7 +304,7 @@ describe("TicketDetailPage", () => {
       renderPage();
       await screen.findByText("Can't log in");
 
-      await userEvent.selectOptions(screen.getByRole("combobox"), "");
+      await userEvent.selectOptions(assignedToSelect(), "");
 
       await waitFor(() =>
         expect(axios.patch).toHaveBeenCalledWith("/api/tickets/1/assign", {
@@ -204,10 +318,9 @@ describe("TicketDetailPage", () => {
       renderPage();
       await screen.findByText("Can't log in");
 
-      const select = screen.getByRole("combobox");
-      await userEvent.selectOptions(select, "agent-1");
+      await userEvent.selectOptions(assignedToSelect(), "agent-1");
 
-      expect(select).toBeDisabled();
+      expect(assignedToSelect()).toBeDisabled();
     });
 
     it("updates the selected value after a successful assignment", async () => {
@@ -217,11 +330,9 @@ describe("TicketDetailPage", () => {
       renderPage();
       await screen.findByText("Can't log in");
 
-      await userEvent.selectOptions(screen.getByRole("combobox"), "agent-2");
+      await userEvent.selectOptions(assignedToSelect(), "agent-2");
 
-      await waitFor(() =>
-        expect(screen.getByRole("combobox")).toHaveValue("agent-2")
-      );
+      await waitFor(() => expect(assignedToSelect()).toHaveValue("agent-2"));
     });
   });
 });

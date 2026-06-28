@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
-import { assignTicketSchema } from "@helpdesk/core";
+import { assignTicketSchema, updateTicketSchema } from "@helpdesk/core";
 import { TicketStatus, Category, type Prisma } from "../generated/prisma";
 
 const router = Router();
@@ -122,6 +122,28 @@ router.patch("/:id/assign", async (req, res) => {
   const ticket = await db.ticket.update({
     where: { id },
     data: { assignedTo: assigneeId },
+    include: { assignee: { select: { id: true, name: true } } },
+  });
+
+  res.json(ticket);
+});
+
+router.patch("/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid ticket ID" });
+    return;
+  }
+
+  const parsed = updateTicketSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0]?.message ?? "Invalid input" });
+    return;
+  }
+
+  const ticket = await db.ticket.update({
+    where: { id },
+    data: parsed.data,
     include: { assignee: { select: { id: true, name: true } } },
   });
 

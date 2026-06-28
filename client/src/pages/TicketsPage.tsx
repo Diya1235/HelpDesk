@@ -47,6 +47,12 @@ const STATUS_STYLES: Record<TicketStatus, string> = {
   Closed: "bg-gray-100 text-gray-500",
 };
 
+const STATUS_LABELS: Record<TicketStatus, string> = {
+  Open: "Open",
+  Resolved: "Resolved",
+  Closed: "Closed",
+};
+
 const CATEGORY_LABELS: Record<Category, string> = {
   GeneralQuestion: "General Question",
   TechnicalQuestion: "Technical Question",
@@ -228,7 +234,7 @@ export function TicketsPage() {
             >
               <option value="">All statuses</option>
               {ticketStatusSchema.options.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>{STATUS_LABELS[s]}</option>
               ))}
             </select>
 

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const ticketStatusSchema = z.enum(["Open", "Resolved", "Closed"]);
 export const categorySchema = z.enum([
-  "GeneralQuestion",
+  "General",
   "TechnicalQuestion",
   "RefundRequest",
 ]);
@@ -12,6 +12,11 @@ export type Category = z.infer<typeof categorySchema>;
 
 export const assignTicketSchema = z.object({
   assigneeId: z.string().nullable(),
+});
+
+export const updateTicketSchema = z.object({
+  status: ticketStatusSchema.optional(),
+  category: categorySchema.nullable().optional(),
 });
 
 export const inboundEmailWebhookSchema = z.object({
