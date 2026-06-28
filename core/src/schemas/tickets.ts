@@ -10,6 +10,10 @@ export const categorySchema = z.enum([
 export type TicketStatus = z.infer<typeof ticketStatusSchema>;
 export type Category = z.infer<typeof categorySchema>;
 
+export const assignTicketSchema = z.object({
+  assigneeId: z.string().nullable(),
+});
+
 export const inboundEmailWebhookSchema = z.object({
   from: z.string().min(1),
   to: z.union([z.string(), z.array(z.string())]).optional(),

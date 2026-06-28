@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
+import { assignTicketSchema } from "@helpdesk/core";
 import { TicketStatus, Category, type Prisma } from "../generated/prisma";
 
 const router = Router();
@@ -84,6 +85,47 @@ router.get("/", async (req, res) => {
   ]);
 
   res.json({ tickets, total });
+});
+
+router.get("/agents", async (_req, res) => {
+  const agents = await db.user.findMany({
+    where: { role: "agent" },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+  res.json(agents);
+});
+
+router.patch("/:id/assign", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid ticket ID" });
+    return;
+  }
+
+  const parsed = assignTicketSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0]?.message ?? "Invalid input" });
+    return;
+  }
+
+  const { assigneeId } = parsed.data;
+
+  if (assigneeId !== null) {
+    const agent = await db.user.findUnique({ where: { id: assigneeId } });
+    if (!agent || agent.role !== "agent") {
+      res.status(400).json({ error: "Assignee must be a valid agent" });
+      return;
+    }
+  }
+
+  const ticket = await db.ticket.update({
+    where: { id },
+    data: { assignedTo: assigneeId },
+    include: { assignee: { select: { id: true, name: true } } },
+  });
+
+  res.json(ticket);
 });
 
 router.get("/:id", async (req, res) => {

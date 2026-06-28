@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronDown } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { TicketCategory } from "../components/TicketCategory";
 import { Skeleton } from "../components/ui/skeleton";
@@ -9,6 +9,11 @@ import { ticketStatusSchema, categorySchema } from "@helpdesk/core";
 
 type TicketStatus = (typeof ticketStatusSchema.options)[number];
 type Category = (typeof categorySchema.options)[number];
+
+interface Agent {
+  id: string;
+  name: string;
+}
 
 interface TicketDetail {
   id: number;
@@ -32,11 +37,28 @@ const STATUS_STYLES: Record<TicketStatus, string> = {
 
 export function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const qc = useQueryClient();
 
   const { data: ticket, isLoading, isError } = useQuery<TicketDetail>({
     queryKey: ["ticket", id],
     queryFn: () => axios.get<TicketDetail>(`/api/tickets/${id}`).then((r) => r.data),
     enabled: !!id,
+  });
+
+  const { data: agents = [] } = useQuery<Agent[]>({
+    queryKey: ["agents"],
+    queryFn: () => axios.get<Agent[]>("/api/tickets/agents").then((r) => r.data),
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: (assigneeId: string | null) =>
+      axios
+        .patch<TicketDetail>(`/api/tickets/${id}/assign`, { assigneeId })
+        .then((r) => r.data),
+    onSuccess: (updated) => {
+      qc.setQueryData(["ticket", id], updated);
+      qc.invalidateQueries({ queryKey: ["tickets"] });
+    },
   });
 
   return (
@@ -97,11 +119,24 @@ export function TicketDetailPage() {
               </div>
               <div>
                 <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Assigned To</p>
-                {ticket.assignee ? (
-                  <p className="text-gray-800">{ticket.assignee.name}</p>
-                ) : (
-                  <p className="text-gray-300">Unassigned</p>
-                )}
+                <div className="relative inline-block">
+                  <select
+                    value={ticket.assignee?.id ?? ""}
+                    disabled={assignMutation.isPending}
+                    onChange={(e) =>
+                      assignMutation.mutate(e.target.value || null)
+                    }
+                    className="appearance-none text-sm border border-gray-200 rounded-md pl-2.5 pr-8 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <option value="">Unassigned</option>
+                    {agents.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
               </div>
               <div>
                 <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Received</p>
