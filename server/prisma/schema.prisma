@@ -5,11 +5,24 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  
 }
 
 enum Role {
   admin
   agent
+}
+
+enum TicketStatus {
+  Open
+  Resolved
+  Closed
+}
+
+enum Category {
+  GeneralQuestion
+  TechnicalQuestion
+  RefundRequest
 }
 
 model user {
@@ -23,6 +36,7 @@ model user {
   role          Role      @default(agent)
   sessions      session[]
   accounts      account[]
+  tickets       Ticket[]
 }
 
 model session {
@@ -52,6 +66,21 @@ model account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+}
+
+model Ticket {
+  id         Int          @id @default(autoincrement())
+  subject    String
+  body       String
+  bodyHtml   String?
+  fromEmail  String
+  fromName   String
+  status     TicketStatus @default(Open)
+  category   Category?
+  assignedTo String?
+  assignee   user?        @relation(fields: [assignedTo], references: [id], onDelete: SetNull)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
 
 model verification {

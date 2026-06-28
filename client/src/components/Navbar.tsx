@@ -17,6 +17,12 @@ export function Navbar() {
         <Link to="/" className="text-lg font-bold text-gray-850 tracking-tight">
           Helpdesk
         </Link>
+        <Link
+          to="/tickets"
+          className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          Tickets
+        </Link>
         {isAdmin && (
           <Link
             to="/users"
@@ -31,9 +37,16 @@ export function Navbar() {
         <span className="text-sm font-medium text-gray-500">
           {session?.user.name}
         </span>
+        {session?.user && (
+          <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+            isAdmin ? "bg-violet-100 text-violet-700" : "bg-gray-100 text-gray-600"
+          }`}>
+            {isAdmin ? "admin" : "agent"}
+          </span>
+        )}
         <button
           onClick={handleSignOut}
-          className="text-sm bg-gray-100 text-gray-700 border border-gray-200 rounded-md px-3.5 py-1.5 hover:bg-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
+          className="text-sm bg-gray-800 text-white border border-gray-700 rounded-md px-3.5 py-1.5 hover:bg-gray-900 hover:border-gray-800 transition-colors cursor-pointer"
         >
           Sign Out
         </button>

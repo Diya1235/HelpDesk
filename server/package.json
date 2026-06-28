@@ -10,7 +10,7 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
-    "db:seed": "bun run --env-file=../.env prisma/seed.ts",
+    "db:seed": "bun run --env-file=./.env prisma/seed.ts",
     "dev:test": "bun run --env-file=../.env.test --watch src/index.ts",
     "db:seed:test": "bun run --env-file=../.env.test prisma/seed.ts"
   },

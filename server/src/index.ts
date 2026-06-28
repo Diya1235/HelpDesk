@@ -7,6 +7,8 @@ import { auth } from "./lib/auth";
 import { requireAuth } from "./middleware/requireAuth";
 import { errorHandler } from "./middleware/errorHandler";
 import usersRouter from "./routes/users";
+import ticketsRouter from "./routes/tickets";
+import webhooksRouter from "./routes/webhooks";
 
 const REQUIRED_ENV = ["BETTER_AUTH_SECRET", "BETTER_AUTH_URL", "DATABASE_URL"];
 for (const key of REQUIRED_ENV) {
@@ -60,6 +62,8 @@ app.use("/api/auth/sign-in/email", (_req, res, next) => {
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
+app.use("/api/webhooks", webhooksRouter);
+app.use("/api/tickets", ticketsRouter);
 app.use("/api/users", usersRouter);
 
 app.get("/me", requireAuth, (req, res) => {

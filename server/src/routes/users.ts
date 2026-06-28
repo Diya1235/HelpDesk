@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { createUserSchema, updateRoleSchema } from "@helpdesk/core";
+import { createUserSchema, updateRoleSchema, editUserSchema } from "@helpdesk/core";
 import { db } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
 import { requireRole } from "../middleware/requireRole";
@@ -52,6 +52,41 @@ router.post("/", async (req, res) => {
     select: { id: true, name: true, email: true, role: true, createdAt: true },
   });
   res.status(201).json(user);
+});
+
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const parsed = editUserSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0]?.message ?? "Invalid input" });
+    return;
+  }
+
+  const { name, email, password } = parsed.data;
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const conflict = await db.user.findFirst({ where: { email: normalizedEmail, NOT: { id } } });
+  if (conflict) {
+    res.status(409).json({ error: "A user with that email already exists" });
+    return;
+  }
+
+  const user = await db.user.update({
+    where: { id },
+    data: { name: name.trim(), email: normalizedEmail },
+    select: { id: true, name: true, email: true, role: true, createdAt: true },
+  });
+
+  if (password) {
+    const hashedPassword = await Bun.password.hash(password);
+    await db.account.updateMany({
+      where: { userId: id, providerId: "credential" },
+      data: { password: hashedPassword },
+    });
+  }
+
+  res.json(user);
 });
 
 router.patch("/:id/role", async (req, res) => {

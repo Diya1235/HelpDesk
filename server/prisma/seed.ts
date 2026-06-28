@@ -17,9 +17,10 @@ const seedAuth = betterAuth({
   emailAndPassword: { enabled: true },
 });
 
-// Fixed credentials for the test agent — used by E2E tests in e2e/auth.spec.ts.
-const AGENT_EMAIL = "agent@example.com";
-const AGENT_PASSWORD = "AgentPassword123!";
+const AGENTS = [
+  { email: "agent@example.com", password: "AgentPassword123!", name: "Test Agent" },
+  { email: "sara.jones@example.com", password: "AgentPassword123!", name: "Sara Jones" },
+];
 
 async function main() {
   // --- Admin user ---
@@ -44,17 +45,15 @@ async function main() {
     console.log(`Admin user created: ${email} (role: admin)`);
   }
 
-  // --- Test agent user ---
-  // Role defaults to "agent" via the Prisma schema (@default(agent)), so no
-  // explicit role update is needed here.
-  const existingAgent = await db.user.findUnique({ where: { email: AGENT_EMAIL } });
-  if (existingAgent) {
-    console.log(`Test agent user already exists (${AGENT_EMAIL}), skipping.`);
-  } else {
-    await seedAuth.api.signUpEmail({
-      body: { email: AGENT_EMAIL, password: AGENT_PASSWORD, name: "Test Agent" },
-    });
-    console.log(`Test agent user created: ${AGENT_EMAIL} (role: agent)`);
+  // --- Agent users ---
+  for (const agent of AGENTS) {
+    const existing = await db.user.findUnique({ where: { email: agent.email } });
+    if (existing) {
+      console.log(`Agent already exists (${agent.email}), skipping.`);
+    } else {
+      await seedAuth.api.signUpEmail({ body: agent });
+      console.log(`Agent created: ${agent.email}`);
+    }
   }
 }
 

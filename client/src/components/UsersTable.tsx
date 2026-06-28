@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Trash2, ArrowLeftRight } from "lucide-react";
+import { Trash2, ArrowLeftRight, Pencil } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import { EditUserModal } from "./EditUserModal";
 
 type Role = "admin" | "agent";
 
@@ -22,6 +24,7 @@ interface Props {
 
 export function UsersTable({ users, isLoading, isError, currentUserId }: Props) {
   const qc = useQueryClient();
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const toggleRole = useMutation({
     mutationFn: (user: User) => {
@@ -85,6 +88,7 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
   }
 
   return (
+    <>
     <table className="w-full text-sm">
       <thead className="bg-gray-50 border-b border-gray-100">{headers}</thead>
       <tbody className="divide-y divide-gray-50">
@@ -115,6 +119,13 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
               {user.id !== currentUserId && (
                 <div className="flex items-center gap-1 justify-end">
                   <button
+                    onClick={() => setEditingUser(user)}
+                    title="Edit user"
+                    className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                  <button
                     onClick={() => toggleRole.mutate(user)}
                     disabled={toggleRole.isPending && toggleRole.variables?.id === user.id}
                     title={`Make ${user.role === "admin" ? "agent" : "admin"}`}
@@ -137,5 +148,7 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
         ))}
       </tbody>
     </table>
+    <EditUserModal user={editingUser} onClose={() => setEditingUser(null)} />
+    </>
   );
 }
