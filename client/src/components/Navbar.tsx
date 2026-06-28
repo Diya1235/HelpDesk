@@ -14,9 +14,9 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-10 bg-background border-b border-border shadow-sm h-14 flex items-center justify-between px-6">
       <div className="flex items-center gap-6">
-        <span className="text-lg font-bold text-gray-850 tracking-tight">
+        <Link to="/" className="text-lg font-bold text-gray-850 tracking-tight">
           Helpdesk
-        </span>
+        </Link>
         {isAdmin && (
           <Link
             to="/users"

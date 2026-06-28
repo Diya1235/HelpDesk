@@ -9,6 +9,7 @@ import { Navbar } from "../components/Navbar";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { Skeleton } from "../components/ui/skeleton";
 import { authClient } from "../lib/auth-client";
 
 type Role = "admin" | "agent";
@@ -158,7 +159,28 @@ export function UsersPage() {
 
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
           {isLoading ? (
-            <div className="p-10 text-center text-sm text-gray-400">Loading...</div>
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Name</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Email</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Role</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Joined</th>
+                  <th className="w-20 px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-28" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-40" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-5 w-14 rounded" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
+                    <td className="px-4 py-3" />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : isError ? (
             <div className="p-10 text-center text-sm text-red-500">Failed to load users.</div>
           ) : users.length === 0 ? (
