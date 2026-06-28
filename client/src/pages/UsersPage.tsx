@@ -10,6 +10,12 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Skeleton } from "../components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import { authClient } from "../lib/auth-client";
 
 type Role = "admin" | "agent";
@@ -23,7 +29,7 @@ interface User {
 }
 
 const createSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(3, "Name must be at least 3 characters").max(100, "Name must be 100 characters or fewer"),
   email: z.string().email("Invalid email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
@@ -40,7 +46,7 @@ export function UsersPage() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<CreateForm>({ resolver: zodResolver(createSchema) });
+  } = useForm<CreateForm>({ resolver: zodResolver(createSchema), mode: "onChange" });
 
   const { data: users = [], isLoading, isError } = useQuery<User[]>({
     queryKey: ["users"],
@@ -110,24 +116,24 @@ export function UsersPage() {
               </p>
             )}
           </div>
-          {!showForm && (
-            <Button onClick={openForm}>
-              <UserPlus className="w-4 h-4 mr-1.5" />
-              Add Agent
-            </Button>
-          )}
+          <Button onClick={openForm}>
+            <UserPlus className="w-4 h-4 mr-1.5" />
+            Add Agent
+          </Button>
         </div>
 
-        {showForm && (
-          <div className="mb-6 bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-            <h2 className="text-sm font-semibold text-gray-700 mb-4">New Agent</h2>
+        <Dialog open={showForm} onOpenChange={(open) => { if (!open) closeForm(); }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>New Agent</DialogTitle>
+            </DialogHeader>
             <form
               onSubmit={handleSubmit((data) => createUser.mutate(data))}
-              className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+              className="flex flex-col gap-4 pt-2"
             >
               <div className="flex flex-col gap-1">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="Jane Smith" autoFocus {...register("name")} />
+                <Input id="name" placeholder="Jane Smith" autoFocus maxLength={100} {...register("name")} />
                 {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
               </div>
 
@@ -143,9 +149,9 @@ export function UsersPage() {
                 {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
               </div>
 
-              {formError && <p className="sm:col-span-3 text-sm text-red-500">{formError}</p>}
+              {formError && <p className="text-sm text-red-500">{formError}</p>}
 
-              <div className="sm:col-span-3 flex gap-2 justify-end pt-1">
+              <div className="flex gap-2 justify-end pt-1">
                 <Button type="button" variant="outline" onClick={closeForm}>
                   Cancel
                 </Button>
@@ -154,8 +160,8 @@ export function UsersPage() {
                 </Button>
               </div>
             </form>
-          </div>
-        )}
+          </DialogContent>
+        </Dialog>
 
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
           {isLoading ? (
