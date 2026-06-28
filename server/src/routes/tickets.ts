@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { db } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
-import { assignTicketSchema, updateTicketSchema } from "@helpdesk/core";
-import { TicketStatus, Category, type Prisma } from "../generated/prisma";
+import { assignTicketSchema, updateTicketSchema, createReplySchema } from "@helpdesk/core";
+import { TicketStatus, Category, SenderType, type Prisma } from "../generated/prisma";
 
 const router = Router();
 
@@ -24,6 +24,14 @@ const VALID_CATEGORIES = Object.values(Category);
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
+
+const TICKET_INCLUDE = {
+  assignee: { select: { id: true, name: true } },
+  replies: {
+    orderBy: { createdAt: "asc" as const },
+    include: { author: { select: { id: true, name: true, role: true } } },
+  },
+} satisfies Prisma.TicketInclude;
 
 router.get("/", async (req, res) => {
   // --- sort ---
@@ -122,7 +130,7 @@ router.patch("/:id/assign", async (req, res) => {
   const ticket = await db.ticket.update({
     where: { id },
     data: { assignedTo: assigneeId },
-    include: { assignee: { select: { id: true, name: true } } },
+    include: TICKET_INCLUDE,
   });
 
   res.json(ticket);
@@ -144,7 +152,7 @@ router.patch("/:id", async (req, res) => {
   const ticket = await db.ticket.update({
     where: { id },
     data: parsed.data,
-    include: { assignee: { select: { id: true, name: true } } },
+    include: TICKET_INCLUDE,
   });
 
   res.json(ticket);
@@ -159,7 +167,7 @@ router.get("/:id", async (req, res) => {
 
   const ticket = await db.ticket.findUnique({
     where: { id },
-    include: { assignee: { select: { id: true, name: true } } },
+    include: TICKET_INCLUDE,
   });
 
   if (!ticket) {
@@ -168,6 +176,43 @@ router.get("/:id", async (req, res) => {
   }
 
   res.json(ticket);
+});
+
+router.post("/:id/replies", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid ticket ID" });
+    return;
+  }
+
+  const parsed = createReplySchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0]?.message ?? "Invalid input" });
+    return;
+  }
+
+  const ticket = await db.ticket.findUnique({ where: { id } });
+  if (!ticket) {
+    res.status(404).json({ error: "Ticket not found" });
+    return;
+  }
+
+  const senderType: SenderType =
+    req.user.role === "admin" || req.user.role === "agent"
+      ? SenderType.Agent
+      : SenderType.Customer;
+
+  const reply = await db.reply.create({
+    data: {
+      body: parsed.data.body,
+      senderType,
+      authorId: req.user.id,
+      ticketId: id,
+    },
+    include: { author: { select: { id: true, name: true, role: true } } },
+  });
+
+  res.status(201).json(reply);
 });
 
 export default router;

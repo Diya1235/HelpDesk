@@ -114,7 +114,7 @@ Schema lives in `server/prisma/schema.prisma`. Always run `prisma generate` afte
 
 ## Testing
 
-**Default to component tests.** Use E2E tests only for flows that genuinely require a real browser, a running server, and a live database — multi-step user journeys, auth redirects, and webhook-to-UI pipelines. Everything else (rendering, validation, interactions, query/mutation logic) belongs in component tests.
+**Default to component tests.** Unit/component tests are the first choice for all rendering, validation, interaction, and query/mutation logic. E2E tests are expensive and slow — only write them when the scenario genuinely cannot be tested any other way.
 
 ### Component tests (preferred)
 - Framework: Vitest + React Testing Library (`client/src/**/*.test.tsx`)
@@ -122,11 +122,13 @@ Schema lives in `server/prisma/schema.prisma`. Always run `prisma generate` afte
 - Use `renderWithQuery` from `client/src/test/renderWithQuery.tsx` for components that use TanStack Query
 - Mock HTTP at the `axios` level; do not mock React Query internals
 
-### E2E tests (use only when necessary)
+### E2E tests (last resort only)
 - Framework: Playwright. **Always use the `playwright-e2e-writer` agent** — do not write Playwright tests inline.
 - Run: `npm run test:e2e` from root. Test files live in `/e2e`.
 - The agent has full context on the test DB (`helpdesk_test`), globalSetup flow, auth credentials, and conventions.
-- Use E2E when the test requires: a real auth session + real DB + browser rendering together, or a full request pipeline (e.g. inbound webhook → ticket visible in UI).
+- **Only write an E2E test when all three are required together: a real auth session + a real DB + browser rendering.** If any one of those can be mocked or faked, write a component test instead.
+- Qualifying scenarios: login/logout flow with session persistence, auth redirect enforcement, full inbound-email-to-ticket pipeline.
+- **Never write an E2E test for something already covered by a component test.** If a component test exists for a flow, do not duplicate it in E2E. If an E2E test covers a flow that a component test can cover, delete the E2E test and write the component test instead.
 
 ## Implementation Phases
 

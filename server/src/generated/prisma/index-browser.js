@@ -173,6 +173,15 @@ exports.Prisma.TicketScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ReplyScalarFieldEnum = {
+  id: 'id',
+  body: 'body',
+  senderType: 'senderType',
+  authorId: 'authorId',
+  ticketId: 'ticketId',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.VerificationScalarFieldEnum = {
   id: 'id',
   identifier: 'identifier',
@@ -213,11 +222,17 @@ exports.Category = exports.$Enums.Category = {
   RefundRequest: 'RefundRequest'
 };
 
+exports.SenderType = exports.$Enums.SenderType = {
+  Agent: 'Agent',
+  Customer: 'Customer'
+};
+
 exports.Prisma.ModelName = {
   user: 'user',
   session: 'session',
   account: 'account',
   Ticket: 'Ticket',
+  Reply: 'Reply',
   verification: 'verification'
 };
 
