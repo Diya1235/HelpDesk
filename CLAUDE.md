@@ -104,6 +104,7 @@ Schema lives in `server/prisma/schema.prisma`. Always run `prisma generate` afte
 - **Shared schemas:** Define all Zod schemas in `/core/src/schemas/` and export them from `/core/src/index.ts`. Import into both server route files and client form files via `@helpdesk/core` — never duplicate a schema across packages.
 - **Server:** Use `schema.safeParse(req.body)` in route handlers. Return the first error message as `{ error: "..." }` with status `400`. No manual `if (!field)` checks.
 - **Client:** Use `react-hook-form` with `zodResolver` and the shared schema from `@helpdesk/core`. Pass `mode: "onChange"` so errors show while typing. Infer the form type from the schema with `z.infer<typeof schema>` (or use the exported type from core).
+- **Enum union types:** Derive union types from Zod enum schemas instead of hardcoding or importing a pre-built type. Use `(typeof mySchema.options)[number]` — e.g. `type TicketStatus = (typeof ticketStatusSchema.options)[number]`. This keeps the type in sync with the schema automatically.
 
 ### Data Fetching (Client)
 - **HTTP client:** Always use `axios` — never the native `fetch` API.
@@ -113,11 +114,19 @@ Schema lives in `server/prisma/schema.prisma`. Always run `prisma generate` afte
 
 ## Testing
 
-All E2E tests are written with Playwright. **Always use the `playwright-e2e-writer` agent to write tests** — do not write Playwright tests inline.
+**Default to component tests.** Use E2E tests only for flows that genuinely require a real browser, a running server, and a live database — multi-step user journeys, auth redirects, and webhook-to-UI pipelines. Everything else (rendering, validation, interactions, query/mutation logic) belongs in component tests.
 
-Run tests: `npm run test:e2e` from root.
+### Component tests (preferred)
+- Framework: Vitest + React Testing Library (`client/src/**/*.test.tsx`)
+- Run: `npm run test` inside `/client`
+- Use `renderWithQuery` from `client/src/test/renderWithQuery.tsx` for components that use TanStack Query
+- Mock HTTP at the `axios` level; do not mock React Query internals
 
-Test files live in `/e2e`. The agent has full context on the test DB setup, auth credentials, and conventions.
+### E2E tests (use only when necessary)
+- Framework: Playwright. **Always use the `playwright-e2e-writer` agent** — do not write Playwright tests inline.
+- Run: `npm run test:e2e` from root. Test files live in `/e2e`.
+- The agent has full context on the test DB (`helpdesk_test`), globalSetup flow, auth credentials, and conventions.
+- Use E2E when the test requires: a real auth session + real DB + browser rendering together, or a full request pipeline (e.g. inbound webhook → ticket visible in UI).
 
 ## Implementation Phases
 

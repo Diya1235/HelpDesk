@@ -4,9 +4,10 @@ import { Navbar } from "../components/Navbar";
 import { Skeleton } from "../components/ui/skeleton";
 import { TicketCategory } from "../components/TicketCategory";
 
-import type { Category } from "@helpdesk/core";
+import { ticketStatusSchema, categorySchema } from "@helpdesk/core";
 
-type TicketStatus = "Open" | "Resolved" | "Closed";
+type TicketStatus = (typeof ticketStatusSchema.options)[number];
+type Category = (typeof categorySchema.options)[number];
 
 interface Ticket {
   id: number;

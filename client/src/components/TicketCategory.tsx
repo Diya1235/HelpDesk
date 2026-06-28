@@ -1,4 +1,6 @@
-import { categorySchema, type Category } from "@helpdesk/core";
+import { categorySchema } from "@helpdesk/core";
+
+type Category = (typeof categorySchema.options)[number];
 
 const LABELS: Record<Category, string> = {
   GeneralQuestion: "General",
