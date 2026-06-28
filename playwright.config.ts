@@ -6,6 +6,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env.test') });
 
 export default defineConfig({
   testDir: './e2e',
+  outputDir: './e2e/test-results',
   globalSetup: './e2e/global-setup.ts',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
@@ -13,7 +14,7 @@ export default defineConfig({
   workers: 1,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
     trace: 'on-first-retry',
   },
   projects: [
@@ -27,14 +28,15 @@ export default defineConfig({
     {
       command: 'bun run dev:test',
       cwd: path.resolve(__dirname, 'server'),
-      port: 3001,
+      port: 3002,
       reuseExistingServer: !process.env.CI,
       timeout: 30_000,
     },
     {
-      command: 'bun run dev',
+      command: 'bun run dev -- --port 5174',
       cwd: path.resolve(__dirname, 'client'),
-      port: 5173,
+      port: 5174,
+      env: { API_PORT: '3002' },
       reuseExistingServer: !process.env.CI,
       timeout: 30_000,
     },

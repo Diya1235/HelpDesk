@@ -99,6 +99,14 @@ Before assigning to an agent, a knowledge base lookup checks previously resolved
 ### Database (Prisma)
 Schema lives in `server/prisma/schema.prisma`. Always run `prisma generate` after schema changes. Migrations are committed to source control.
 
+## Testing
+
+All E2E tests are written with Playwright. **Always use the `playwright-e2e-writer` agent to write tests** — do not write Playwright tests inline.
+
+Run tests: `npm run test:e2e` from root.
+
+Test files live in `/e2e`. The agent has full context on the test DB setup, auth credentials, and conventions.
+
 ## Implementation Phases
 
 See `implementation-plan.md` for the full phased roadmap (setup → auth → users → tickets → AI → email → dashboard → Docker).
