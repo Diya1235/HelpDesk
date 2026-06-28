@@ -1,7 +1,9 @@
-import { screen, waitFor } from "@testing-library/react";
+
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { renderWithQuery } from "../test/renderWithQuery";
 import axios from "axios";
 import { authClient } from "../lib/auth-client";
 import { UsersPage } from "./UsersPage";
@@ -38,7 +40,19 @@ const USERS = [
 ];
 
 function renderPage() {
-  return renderWithQuery(<UsersPage />);
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UsersPage />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
 }
 
 beforeEach(() => {
@@ -162,6 +176,44 @@ describe("UsersPage", () => {
       });
     });
 
+    describe("modal dismiss", () => {
+      it("shows the dialog when Add Agent is clicked", async () => {
+        renderPage();
+        await screen.findByText("Alice");
+
+        expect(screen.queryByText("New Agent")).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole("button", { name: /add agent/i }));
+
+        expect(screen.getByText("New Agent")).toBeInTheDocument();
+      });
+
+      it("closes when clicking the backdrop", async () => {
+        renderPage();
+        await screen.findByText("Alice");
+
+        await userEvent.click(screen.getByRole("button", { name: /add agent/i }));
+        expect(screen.getByText("New Agent")).toBeInTheDocument();
+
+        const backdrop = document.querySelector('[data-slot="dialog-overlay"]');
+        await userEvent.click(backdrop!);
+
+        await waitFor(() => expect(screen.queryByText("New Agent")).not.toBeInTheDocument());
+      });
+
+      it("closes when pressing Escape", async () => {
+        renderPage();
+        await screen.findByText("Alice");
+
+        await userEvent.click(screen.getByRole("button", { name: /add agent/i }));
+        expect(screen.getByText("New Agent")).toBeInTheDocument();
+
+        await userEvent.keyboard("{Escape}");
+
+        await waitFor(() => expect(screen.queryByText("New Agent")).not.toBeInTheDocument());
+      });
+    });
+
     it("shows the server error message when creation fails", async () => {
       vi.mocked(axios.isAxiosError).mockReturnValue(true);
       vi.mocked(axios.post).mockRejectedValue({
@@ -191,7 +243,7 @@ describe("UsersPage", () => {
       await screen.findByText("Bob");
 
       const roleButtons = screen.getAllByTitle(/Make/);
-      await userEvent.click(roleButtons[1]);
+      await userEvent.click(roleButtons[1]!);
 
       expect(axios.patch).toHaveBeenCalledWith("/api/users/2/role", { role: "admin" });
     });
@@ -209,7 +261,7 @@ describe("UsersPage", () => {
       renderPage();
       await screen.findByText("Alice");
 
-      await userEvent.click(screen.getAllByTitle("Delete user")[0]);
+      await userEvent.click(screen.getAllByTitle("Delete user")[0]!);
 
       expect(axios.delete).toHaveBeenCalledWith("/api/users/1");
       await waitFor(() => expect(screen.queryByText("Alice")).not.toBeInTheDocument());
@@ -221,7 +273,7 @@ describe("UsersPage", () => {
       renderPage();
       await screen.findByText("Alice");
 
-      await userEvent.click(screen.getAllByTitle("Delete user")[0]);
+      await userEvent.click(screen.getAllByTitle("Delete user")[0]!);
 
       expect(axios.delete).not.toHaveBeenCalled();
       expect(screen.getByText("Alice")).toBeInTheDocument();

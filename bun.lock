@@ -14,6 +14,7 @@
       "dependencies": {
         "@base-ui/react": "^1.6.0",
         "@fontsource-variable/geist": "^5.2.9",
+        "@helpdesk/core": "workspace:*",
         "@hookform/resolvers": "3",
         "@tanstack/react-query": "^5.101.2",
         "axios": "^1.18.1",
@@ -50,9 +51,16 @@
         "vitest": "^2",
       },
     },
+    "core": {
+      "name": "@helpdesk/core",
+      "peerDependencies": {
+        "zod": "3",
+      },
+    },
     "server": {
       "name": "server",
       "dependencies": {
+        "@helpdesk/core": "workspace:*",
         "@prisma/client": "6.19.2",
         "better-auth": "^1.6.22",
         "cors": "^2.8.5",
@@ -251,6 +259,8 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.11", "", {}, "sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg=="],
 
     "@fontsource-variable/geist": ["@fontsource-variable/geist@5.2.9", "", {}, "sha512-TP+QSBG3wxKGPE33CbMy/L0Nu3qvJ6Fy81Yc4LnQ95xH+i+cfEp8fyU8/kfV14YwszxIFPhnoMTbjL71waVpyQ=="],
+
+    "@helpdesk/core": ["@helpdesk/core@workspace:core"],
 
     "@hono/node-server": ["@hono/node-server@1.19.14", "", { "peerDependencies": { "hono": "^4" } }, "sha512-GwtvgtXxnWsucXvbQXkRgqksiH2Qed37H9xHZocE5sA3N8O8O8/8FA3uclQXxXVzc9XBZuEOMK7+r02FmSpHtw=="],
 

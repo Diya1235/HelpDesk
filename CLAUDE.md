@@ -12,6 +12,7 @@ AI-powered helpdesk web app. Receives support emails, auto-creates and classifie
 ```
 /client   — React + TypeScript + Tailwind CSS frontend
 /server   — Node.js + Express + TypeScript backend
+/core     — Shared Zod schemas and types (imported by both client and server)
 ```
 
 ## MCP Servers
@@ -98,6 +99,11 @@ Before assigning to an agent, a knowledge base lookup checks previously resolved
 
 ### Database (Prisma)
 Schema lives in `server/prisma/schema.prisma`. Always run `prisma generate` after schema changes. Migrations are committed to source control.
+
+### Validation
+- **Shared schemas:** Define all Zod schemas in `/core/src/schemas/` and export them from `/core/src/index.ts`. Import into both server route files and client form files via `@helpdesk/core` — never duplicate a schema across packages.
+- **Server:** Use `schema.safeParse(req.body)` in route handlers. Return the first error message as `{ error: "..." }` with status `400`. No manual `if (!field)` checks.
+- **Client:** Use `react-hook-form` with `zodResolver` and the shared schema from `@helpdesk/core`. Pass `mode: "onChange"` so errors show while typing. Infer the form type from the schema with `z.infer<typeof schema>` (or use the exported type from core).
 
 ### Data Fetching (Client)
 - **HTTP client:** Always use `axios` — never the native `fetch` API.

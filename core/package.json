@@ -1,0 +1,10 @@
+{
+  "name": "@helpdesk/core",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "zod": "3"
+  }
+}

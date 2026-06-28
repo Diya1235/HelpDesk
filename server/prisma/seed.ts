@@ -9,6 +9,7 @@ if (!password) {
   console.error("FATAL: SEED_ADMIN_PASSWORD environment variable is required");
   process.exit(1);
 }
+const safePassword = password as string;
 
 // Separate instance without disableSignUp so we can create the user
 const seedAuth = betterAuth({
@@ -32,7 +33,7 @@ async function main() {
     }
   } else {
     const result = await seedAuth.api.signUpEmail({
-      body: { email, password, name: "Admin" },
+      body: { email, password: safePassword, name: "Admin" },
     });
 
     await db.user.update({

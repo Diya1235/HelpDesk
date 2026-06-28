@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { createUserSchema, updateRoleSchema } from "@helpdesk/core";
 import { db } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
 import { requireRole } from "../middleware/requireRole";
@@ -29,17 +30,13 @@ router.get("/", async (_req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { name, email, password } = req.body as {
-    name?: string;
-    email?: string;
-    password?: string;
-  };
-
-  if (!name?.trim() || !email?.trim() || !password) {
-    res.status(400).json({ error: "name, email, and password are required" });
+  const parsed = createUserSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0]?.message ?? "Invalid input" });
     return;
   }
 
+  const { name, email, password } = parsed.data;
   const normalizedEmail = email.trim().toLowerCase();
   const existing = await db.user.findUnique({ where: { email: normalizedEmail } });
   if (existing) {
@@ -59,12 +56,14 @@ router.post("/", async (req, res) => {
 
 router.patch("/:id/role", async (req, res) => {
   const { id } = req.params;
-  const { role } = req.body as { role?: string };
 
-  if (role !== "admin" && role !== "agent") {
-    res.status(400).json({ error: "role must be admin or agent" });
+  const parsed = updateRoleSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0]?.message ?? "Invalid input" });
     return;
   }
+
+  const { role } = parsed.data;
   if (id === req.user.id) {
     res.status(400).json({ error: "Cannot change your own role" });
     return;
@@ -72,7 +71,7 @@ router.patch("/:id/role", async (req, res) => {
 
   const user = await db.user.update({
     where: { id },
-    data: { role: role as "admin" | "agent" },
+    data: { role },
     select: { id: true, name: true, email: true, role: true, createdAt: true },
   });
   res.json(user);
