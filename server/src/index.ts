@@ -5,6 +5,8 @@ import { toNodeHandler } from "better-auth/node";
 import { db } from "./db";
 import { auth } from "./lib/auth";
 import { requireAuth } from "./middleware/requireAuth";
+import { errorHandler } from "./middleware/errorHandler";
+import usersRouter from "./routes/users";
 
 const REQUIRED_ENV = ["BETTER_AUTH_SECRET", "BETTER_AUTH_URL", "DATABASE_URL"];
 for (const key of REQUIRED_ENV) {
@@ -58,6 +60,8 @@ app.use("/api/auth/sign-in/email", (_req, res, next) => {
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
+app.use("/api/users", usersRouter);
+
 app.get("/me", requireAuth, (req, res) => {
   res.json({ user: req.user, session: req.session });
 });
@@ -70,6 +74,8 @@ app.get("/health", async (_req, res) => {
     res.status(503).json({ status: "error", db: "disconnected" });
   }
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, async () => {
   await db.$connect();

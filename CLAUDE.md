@@ -51,7 +51,7 @@ docker compose down         # stop and remove containers
 
 | Layer | Choice |
 |-------|--------|
-| Frontend | React, TypeScript, Tailwind CSS |
+| Frontend | React, TypeScript, Tailwind CSS, Axios, TanStack Query |
 | Backend | Node.js, Express, TypeScript |
 | Database | PostgreSQL + Prisma ORM |
 | Auth | Session-based, sessions stored in PostgreSQL |
@@ -98,6 +98,12 @@ Before assigning to an agent, a knowledge base lookup checks previously resolved
 
 ### Database (Prisma)
 Schema lives in `server/prisma/schema.prisma`. Always run `prisma generate` after schema changes. Migrations are committed to source control.
+
+### Data Fetching (Client)
+- **HTTP client:** Always use `axios` — never the native `fetch` API.
+- **Server state:** Always use TanStack Query (`useQuery`, `useMutation`) for all API calls — no manual `useState` + `useEffect` for fetching. `QueryClientProvider` is set up in `client/src/main.tsx`.
+  - Prefer surgical `qc.setQueryData` updates on mutations when the response contains the full updated object (avoids a round-trip).
+  - Use `qc.invalidateQueries` only when the server response doesn't return the updated data (e.g. creates where you want a full refetch).
 
 ## Testing
 
