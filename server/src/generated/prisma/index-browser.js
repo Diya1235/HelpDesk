@@ -176,6 +176,7 @@ exports.Prisma.TicketScalarFieldEnum = {
 exports.Prisma.ReplyScalarFieldEnum = {
   id: 'id',
   body: 'body',
+  bodyHtml: 'bodyHtml',
   senderType: 'senderType',
   authorId: 'authorId',
   ticketId: 'ticketId',

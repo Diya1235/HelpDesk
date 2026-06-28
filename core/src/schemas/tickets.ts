@@ -15,6 +15,7 @@ export type SenderType = z.infer<typeof senderTypeSchema>;
 export interface Reply {
   id: number;
   body: string;
+  bodyHtml: string | null;
   senderType: SenderType;
   author: { id: string; name: string; role: string };
   createdAt: string;
@@ -45,7 +46,8 @@ export const updateTicketSchema = z.object({
 });
 
 export const createReplySchema = z.object({
-  body: z.string().min(1, "Reply cannot be empty"),
+  body: z.string().min(1, "Reply cannot be empty").max(10000, "Reply cannot exceed 10,000 characters"),
+  bodyHtml: z.string().nullable().optional(),
 });
 export type CreateReply = z.infer<typeof createReplySchema>;
 

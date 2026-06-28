@@ -6155,6 +6155,7 @@ export namespace Prisma {
   export type ReplyMinAggregateOutputType = {
     id: number | null
     body: string | null
+    bodyHtml: string | null
     senderType: $Enums.SenderType | null
     authorId: string | null
     ticketId: number | null
@@ -6164,6 +6165,7 @@ export namespace Prisma {
   export type ReplyMaxAggregateOutputType = {
     id: number | null
     body: string | null
+    bodyHtml: string | null
     senderType: $Enums.SenderType | null
     authorId: string | null
     ticketId: number | null
@@ -6173,6 +6175,7 @@ export namespace Prisma {
   export type ReplyCountAggregateOutputType = {
     id: number
     body: number
+    bodyHtml: number
     senderType: number
     authorId: number
     ticketId: number
@@ -6194,6 +6197,7 @@ export namespace Prisma {
   export type ReplyMinAggregateInputType = {
     id?: true
     body?: true
+    bodyHtml?: true
     senderType?: true
     authorId?: true
     ticketId?: true
@@ -6203,6 +6207,7 @@ export namespace Prisma {
   export type ReplyMaxAggregateInputType = {
     id?: true
     body?: true
+    bodyHtml?: true
     senderType?: true
     authorId?: true
     ticketId?: true
@@ -6212,6 +6217,7 @@ export namespace Prisma {
   export type ReplyCountAggregateInputType = {
     id?: true
     body?: true
+    bodyHtml?: true
     senderType?: true
     authorId?: true
     ticketId?: true
@@ -6308,6 +6314,7 @@ export namespace Prisma {
   export type ReplyGroupByOutputType = {
     id: number
     body: string
+    bodyHtml: string | null
     senderType: $Enums.SenderType
     authorId: string
     ticketId: number
@@ -6336,6 +6343,7 @@ export namespace Prisma {
   export type ReplySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     body?: boolean
+    bodyHtml?: boolean
     senderType?: boolean
     authorId?: boolean
     ticketId?: boolean
@@ -6347,6 +6355,7 @@ export namespace Prisma {
   export type ReplySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     body?: boolean
+    bodyHtml?: boolean
     senderType?: boolean
     authorId?: boolean
     ticketId?: boolean
@@ -6358,6 +6367,7 @@ export namespace Prisma {
   export type ReplySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     body?: boolean
+    bodyHtml?: boolean
     senderType?: boolean
     authorId?: boolean
     ticketId?: boolean
@@ -6369,13 +6379,14 @@ export namespace Prisma {
   export type ReplySelectScalar = {
     id?: boolean
     body?: boolean
+    bodyHtml?: boolean
     senderType?: boolean
     authorId?: boolean
     ticketId?: boolean
     createdAt?: boolean
   }
 
-  export type ReplyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "body" | "senderType" | "authorId" | "ticketId" | "createdAt", ExtArgs["result"]["reply"]>
+  export type ReplyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "body" | "bodyHtml" | "senderType" | "authorId" | "ticketId" | "createdAt", ExtArgs["result"]["reply"]>
   export type ReplyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     author?: boolean | userDefaultArgs<ExtArgs>
     ticket?: boolean | TicketDefaultArgs<ExtArgs>
@@ -6398,6 +6409,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       body: string
+      bodyHtml: string | null
       senderType: $Enums.SenderType
       authorId: string
       ticketId: number
@@ -6829,6 +6841,7 @@ export namespace Prisma {
   interface ReplyFieldRefs {
     readonly id: FieldRef<"Reply", 'Int'>
     readonly body: FieldRef<"Reply", 'String'>
+    readonly bodyHtml: FieldRef<"Reply", 'String'>
     readonly senderType: FieldRef<"Reply", 'SenderType'>
     readonly authorId: FieldRef<"Reply", 'String'>
     readonly ticketId: FieldRef<"Reply", 'Int'>
@@ -8336,6 +8349,7 @@ export namespace Prisma {
   export const ReplyScalarFieldEnum: {
     id: 'id',
     body: 'body',
+    bodyHtml: 'bodyHtml',
     senderType: 'senderType',
     authorId: 'authorId',
     ticketId: 'ticketId',
@@ -8848,6 +8862,7 @@ export namespace Prisma {
     NOT?: ReplyWhereInput | ReplyWhereInput[]
     id?: IntFilter<"Reply"> | number
     body?: StringFilter<"Reply"> | string
+    bodyHtml?: StringNullableFilter<"Reply"> | string | null
     senderType?: EnumSenderTypeFilter<"Reply"> | $Enums.SenderType
     authorId?: StringFilter<"Reply"> | string
     ticketId?: IntFilter<"Reply"> | number
@@ -8859,6 +8874,7 @@ export namespace Prisma {
   export type ReplyOrderByWithRelationInput = {
     id?: SortOrder
     body?: SortOrder
+    bodyHtml?: SortOrderInput | SortOrder
     senderType?: SortOrder
     authorId?: SortOrder
     ticketId?: SortOrder
@@ -8873,6 +8889,7 @@ export namespace Prisma {
     OR?: ReplyWhereInput[]
     NOT?: ReplyWhereInput | ReplyWhereInput[]
     body?: StringFilter<"Reply"> | string
+    bodyHtml?: StringNullableFilter<"Reply"> | string | null
     senderType?: EnumSenderTypeFilter<"Reply"> | $Enums.SenderType
     authorId?: StringFilter<"Reply"> | string
     ticketId?: IntFilter<"Reply"> | number
@@ -8884,6 +8901,7 @@ export namespace Prisma {
   export type ReplyOrderByWithAggregationInput = {
     id?: SortOrder
     body?: SortOrder
+    bodyHtml?: SortOrderInput | SortOrder
     senderType?: SortOrder
     authorId?: SortOrder
     ticketId?: SortOrder
@@ -8901,6 +8919,7 @@ export namespace Prisma {
     NOT?: ReplyScalarWhereWithAggregatesInput | ReplyScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Reply"> | number
     body?: StringWithAggregatesFilter<"Reply"> | string
+    bodyHtml?: StringNullableWithAggregatesFilter<"Reply"> | string | null
     senderType?: EnumSenderTypeWithAggregatesFilter<"Reply"> | $Enums.SenderType
     authorId?: StringWithAggregatesFilter<"Reply"> | string
     ticketId?: IntWithAggregatesFilter<"Reply"> | number
@@ -9344,6 +9363,7 @@ export namespace Prisma {
 
   export type ReplyCreateInput = {
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     createdAt?: Date | string
     author: userCreateNestedOneWithoutRepliesInput
@@ -9353,6 +9373,7 @@ export namespace Prisma {
   export type ReplyUncheckedCreateInput = {
     id?: number
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     authorId: string
     ticketId: number
@@ -9361,6 +9382,7 @@ export namespace Prisma {
 
   export type ReplyUpdateInput = {
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     author?: userUpdateOneRequiredWithoutRepliesNestedInput
@@ -9370,6 +9392,7 @@ export namespace Prisma {
   export type ReplyUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     authorId?: StringFieldUpdateOperationsInput | string
     ticketId?: IntFieldUpdateOperationsInput | number
@@ -9379,6 +9402,7 @@ export namespace Prisma {
   export type ReplyCreateManyInput = {
     id?: number
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     authorId: string
     ticketId: number
@@ -9387,6 +9411,7 @@ export namespace Prisma {
 
   export type ReplyUpdateManyMutationInput = {
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9394,6 +9419,7 @@ export namespace Prisma {
   export type ReplyUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     authorId?: StringFieldUpdateOperationsInput | string
     ticketId?: IntFieldUpdateOperationsInput | number
@@ -9904,6 +9930,7 @@ export namespace Prisma {
   export type ReplyCountOrderByAggregateInput = {
     id?: SortOrder
     body?: SortOrder
+    bodyHtml?: SortOrder
     senderType?: SortOrder
     authorId?: SortOrder
     ticketId?: SortOrder
@@ -9918,6 +9945,7 @@ export namespace Prisma {
   export type ReplyMaxOrderByAggregateInput = {
     id?: SortOrder
     body?: SortOrder
+    bodyHtml?: SortOrder
     senderType?: SortOrder
     authorId?: SortOrder
     ticketId?: SortOrder
@@ -9927,6 +9955,7 @@ export namespace Prisma {
   export type ReplyMinOrderByAggregateInput = {
     id?: SortOrder
     body?: SortOrder
+    bodyHtml?: SortOrder
     senderType?: SortOrder
     authorId?: SortOrder
     ticketId?: SortOrder
@@ -10652,6 +10681,7 @@ export namespace Prisma {
 
   export type ReplyCreateWithoutAuthorInput = {
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     createdAt?: Date | string
     ticket: TicketCreateNestedOneWithoutRepliesInput
@@ -10660,6 +10690,7 @@ export namespace Prisma {
   export type ReplyUncheckedCreateWithoutAuthorInput = {
     id?: number
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     ticketId: number
     createdAt?: Date | string
@@ -10795,6 +10826,7 @@ export namespace Prisma {
     NOT?: ReplyScalarWhereInput | ReplyScalarWhereInput[]
     id?: IntFilter<"Reply"> | number
     body?: StringFilter<"Reply"> | string
+    bodyHtml?: StringNullableFilter<"Reply"> | string | null
     senderType?: EnumSenderTypeFilter<"Reply"> | $Enums.SenderType
     authorId?: StringFilter<"Reply"> | string
     ticketId?: IntFilter<"Reply"> | number
@@ -10980,6 +11012,7 @@ export namespace Prisma {
 
   export type ReplyCreateWithoutTicketInput = {
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     createdAt?: Date | string
     author: userCreateNestedOneWithoutRepliesInput
@@ -10988,6 +11021,7 @@ export namespace Prisma {
   export type ReplyUncheckedCreateWithoutTicketInput = {
     id?: number
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     authorId: string
     createdAt?: Date | string
@@ -11241,6 +11275,7 @@ export namespace Prisma {
   export type ReplyCreateManyAuthorInput = {
     id?: number
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     ticketId: number
     createdAt?: Date | string
@@ -11363,6 +11398,7 @@ export namespace Prisma {
 
   export type ReplyUpdateWithoutAuthorInput = {
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ticket?: TicketUpdateOneRequiredWithoutRepliesNestedInput
@@ -11371,6 +11407,7 @@ export namespace Prisma {
   export type ReplyUncheckedUpdateWithoutAuthorInput = {
     id?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     ticketId?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11379,6 +11416,7 @@ export namespace Prisma {
   export type ReplyUncheckedUpdateManyWithoutAuthorInput = {
     id?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     ticketId?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11387,6 +11425,7 @@ export namespace Prisma {
   export type ReplyCreateManyTicketInput = {
     id?: number
     body: string
+    bodyHtml?: string | null
     senderType: $Enums.SenderType
     authorId: string
     createdAt?: Date | string
@@ -11394,6 +11433,7 @@ export namespace Prisma {
 
   export type ReplyUpdateWithoutTicketInput = {
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     author?: userUpdateOneRequiredWithoutRepliesNestedInput
@@ -11402,6 +11442,7 @@ export namespace Prisma {
   export type ReplyUncheckedUpdateWithoutTicketInput = {
     id?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     authorId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11410,6 +11451,7 @@ export namespace Prisma {
   export type ReplyUncheckedUpdateManyWithoutTicketInput = {
     id?: IntFieldUpdateOperationsInput | number
     body?: StringFieldUpdateOperationsInput | string
+    bodyHtml?: NullableStringFieldUpdateOperationsInput | string | null
     senderType?: EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
     authorId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

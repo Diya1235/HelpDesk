@@ -205,6 +205,7 @@ router.post("/:id/replies", async (req, res) => {
   const reply = await db.reply.create({
     data: {
       body: parsed.data.body,
+      bodyHtml: parsed.data.bodyHtml ?? null,
       senderType,
       authorId: req.user.id,
       ticketId: id,

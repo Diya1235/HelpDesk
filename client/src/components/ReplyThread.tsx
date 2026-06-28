@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import type { Reply } from "@helpdesk/core";
 
 export function ReplyThread({ replies }: { replies: Reply[] }) {
@@ -20,7 +21,14 @@ export function ReplyThread({ replies }: { replies: Reply[] }) {
               <p className="text-xs text-gray-500 mb-1.5">
                 {reply.author.name} · {new Date(reply.createdAt).toLocaleString()}
               </p>
-              <p className="whitespace-pre-wrap leading-relaxed">{reply.body}</p>
+              {reply.bodyHtml ? (
+                <div
+                  className="prose prose-sm max-w-none text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(reply.bodyHtml) }}
+                />
+              ) : (
+                <p className="whitespace-pre-wrap leading-relaxed">{reply.body}</p>
+              )}
             </div>
           </div>
         );
