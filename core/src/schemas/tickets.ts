@@ -1,14 +1,18 @@
 import { z } from "zod";
 
-export const ticketStatusSchema = z.enum(["Open", "Resolved", "Closed"]);
+export const ticketStatusSchema = z.enum(["New", "Processing", "Open", "Resolved", "Closed"]);
+
+export const agentTicketStatusSchema = z.enum(["Open", "Resolved", "Closed"]);
+
 export const categorySchema = z.enum([
-  "General",
+  "GeneralQuestion",
   "TechnicalQuestion",
   "RefundRequest",
 ]);
 export const senderTypeSchema = z.enum(["Agent", "Customer"]);
 
 export type TicketStatus = z.infer<typeof ticketStatusSchema>;
+export type AgentTicketStatus = z.infer<typeof agentTicketStatusSchema>;
 export type Category = z.infer<typeof categorySchema>;
 export type SenderType = z.infer<typeof senderTypeSchema>;
 
@@ -41,7 +45,7 @@ export const assignTicketSchema = z.object({
 });
 
 export const updateTicketSchema = z.object({
-  status: ticketStatusSchema.optional(),
+  status: agentTicketStatusSchema.optional(),
   category: categorySchema.nullable().optional(),
 });
 

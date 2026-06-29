@@ -9,6 +9,7 @@ import { errorHandler } from "./middleware/errorHandler";
 import usersRouter from "./routes/users";
 import ticketsRouter from "./routes/tickets";
 import webhooksRouter from "./routes/webhooks";
+import { startBoss } from "./lib/boss";
 
 const REQUIRED_ENV = ["BETTER_AUTH_SECRET", "BETTER_AUTH_URL", "DATABASE_URL"];
 for (const key of REQUIRED_ENV) {
@@ -83,5 +84,6 @@ app.use(errorHandler);
 
 app.listen(PORT, async () => {
   await db.$connect();
+  await startBoss();
   console.log(`Server running on http://localhost:${PORT}`);
 });

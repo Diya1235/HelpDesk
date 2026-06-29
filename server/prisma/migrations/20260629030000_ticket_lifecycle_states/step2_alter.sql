@@ -1,0 +1,2 @@
+ALTER TABLE "Ticket" ALTER COLUMN "status" SET DEFAULT 'New';
+ALTER TABLE "Ticket" DROP COLUMN IF EXISTS "autoResolved";

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { inboundEmailWebhookSchema } from "@helpdesk/core";
 import { db } from "../db";
+import { boss, CLASSIFY_JOB, type ClassifyTicketData } from "../lib/boss";
 
 const router = Router();
 
@@ -57,6 +58,12 @@ router.post("/inbound-email", async (req, res) => {
   });
 
   res.status(201).json({ id: ticket.id });
+
+  await boss.send<ClassifyTicketData>(CLASSIFY_JOB, {
+    ticketId: ticket.id,
+    subject: ticket.subject,
+    body: ticket.body,
+  });
 });
 
 export default router;

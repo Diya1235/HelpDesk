@@ -450,14 +450,31 @@ describe("reply form", () => {
     expect(sendButton()).toBeInTheDocument();
   });
 
-  it("shows a validation error when submitting with an empty body", async () => {
+  it("disables Send Reply when the textarea is empty", async () => {
     renderPage();
     await screen.findByText("Can't log in");
 
-    await userEvent.click(sendButton());
-
-    await screen.findByText("Reply cannot be empty");
+    expect(sendButton()).toBeDisabled();
     expect(axios.post).not.toHaveBeenCalled();
+  });
+
+  it("enables Send Reply once the user types something", async () => {
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "Hello");
+
+    expect(sendButton()).not.toBeDisabled();
+  });
+
+  it("re-disables Send Reply when the textarea is cleared", async () => {
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "Hello");
+    await userEvent.clear(replyTextarea());
+
+    expect(sendButton()).toBeDisabled();
   });
 
   it("calls POST /api/tickets/1/replies with the typed body", async () => {
@@ -521,5 +538,95 @@ describe("reply form", () => {
 
     await screen.findByText("Thanks for reaching out, we are looking into this.");
   });
+});
 
+// ─── Polish button ────────────────────────────────────────────────────────────
+
+describe("Polish button", () => {
+  const polishButton = () => screen.getByRole("button", { name: /polish/i });
+
+  beforeEach(() => mockGetSuccess());
+
+  it("renders the Polish button", async () => {
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    expect(polishButton()).toBeInTheDocument();
+  });
+
+  it("is disabled when the textarea is empty", async () => {
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    expect(polishButton()).toBeDisabled();
+  });
+
+  it("is enabled after the user types a reply", async () => {
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "draft reply");
+
+    expect(polishButton()).not.toBeDisabled();
+  });
+
+  it("is disabled again when the textarea is cleared", async () => {
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "draft reply");
+    await userEvent.clear(replyTextarea());
+
+    expect(polishButton()).toBeDisabled();
+  });
+
+  it("calls POST /api/tickets/1/polish-reply with the current body", async () => {
+    vi.mocked(axios.post).mockResolvedValue({ data: { body: "Polished text" } });
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "rough draft");
+    await userEvent.click(polishButton());
+
+    await waitFor(() =>
+      expect(axios.post).toHaveBeenCalledWith(
+        "/api/tickets/1/polish-reply",
+        { body: "rough draft" },
+      ),
+    );
+  });
+
+  it("replaces the textarea content with the polished text on success", async () => {
+    vi.mocked(axios.post).mockResolvedValue({ data: { body: "Polished text" } });
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "rough draft");
+    await userEvent.click(polishButton());
+
+    await waitFor(() => expect(replyTextarea()).toHaveValue("Polished text"));
+  });
+
+  it("shows 'Polishing…' on the button while the request is in flight", async () => {
+    vi.mocked(axios.post).mockReturnValue(new Promise(() => {}));
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "rough draft");
+    await userEvent.click(polishButton());
+
+    expect(screen.getByRole("button", { name: /polishing/i })).toBeInTheDocument();
+  });
+
+  it("disables both buttons while polishing is pending", async () => {
+    vi.mocked(axios.post).mockReturnValue(new Promise(() => {}));
+    renderPage();
+    await screen.findByText("Can't log in");
+
+    await userEvent.type(replyTextarea(), "rough draft");
+    await userEvent.click(polishButton());
+
+    expect(polishButton()).toBeDisabled();
+    expect(sendButton()).toBeDisabled();
+  });
 });

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, FileText, RefreshCw } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Navbar } from "../components/Navbar";
@@ -29,10 +29,20 @@ export function TicketDetailPage() {
     reset,
     setValue,
     getValues,
+    watch,
     formState: { errors },
   } = useForm<CreateReply>({
     resolver: zodResolver(createReplySchema),
     mode: "onChange",
+  });
+
+  const replyBody = watch("body", "");
+
+  const summarizeMutation = useMutation({
+    mutationFn: () =>
+      axios
+        .post<{ summary: string }>(`/api/tickets/${id}/summarize`)
+        .then((r) => r.data),
   });
 
   const polishMutation = useMutation({
@@ -102,6 +112,41 @@ export function TicketDetailPage() {
                 bodyHtml={ticket.bodyHtml}
               />
 
+              {/* Summary section */}
+              <div className="px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <p className={LABEL_CLS}>Conversation Summary</p>
+                  {summarizeMutation.data && (
+                    <button
+                      type="button"
+                      onClick={() => summarizeMutation.mutate()}
+                      disabled={summarizeMutation.isPending}
+                      className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <RefreshCw className="h-3 w-3" />
+                      Regenerate
+                    </button>
+                  )}
+                </div>
+                {summarizeMutation.data ? (
+                  <p className="text-sm text-gray-700 leading-relaxed bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                    {summarizeMutation.data.summary}
+                  </p>
+                ) : ticket.replies.length === 0 ? (
+                  <p className="text-xs text-gray-400 italic">No replies yet — nothing to summarize.</p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => summarizeMutation.mutate()}
+                    disabled={summarizeMutation.isPending}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FileText className="h-4 w-4" />
+                    {summarizeMutation.isPending ? "Summarizing…" : "Summarize conversation"}
+                  </button>
+                )}
+              </div>
+
               <ReplyThread replies={ticket.replies} />
 
               {/* Reply form */}
@@ -118,21 +163,18 @@ export function TicketDetailPage() {
                     className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 bg-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 resize-none disabled:opacity-50"
                     disabled={replyMutation.isPending}
                   />
-                  {errors.body && (
-                    <p className="text-xs text-red-500">{errors.body.message}</p>
-                  )}
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => polishMutation.mutate(getValues("body"))}
-                      disabled={polishMutation.isPending || replyMutation.isPending}
+                      disabled={!replyBody.trim() || polishMutation.isPending || replyMutation.isPending}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {polishMutation.isPending ? "Polishing…" : "✨ Polish"}
                     </button>
                     <button
                       type="submit"
-                      disabled={replyMutation.isPending || polishMutation.isPending}
+                      disabled={!replyBody.trim() || replyMutation.isPending || polishMutation.isPending}
                       className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {replyMutation.isPending ? "Sending…" : "Send Reply"}

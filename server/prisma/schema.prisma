@@ -14,6 +14,8 @@ enum Role {
 }
 
 enum TicketStatus {
+  New
+  Processing
   Open
   Resolved
   Closed
@@ -75,19 +77,19 @@ model account {
 }
 
 model Ticket {
-  id         Int          @id @default(autoincrement())
-  subject    String
-  body       String
-  bodyHtml   String?
-  fromEmail  String
-  fromName   String
-  status     TicketStatus @default(Open)
-  category   Category?
-  assignedTo String?
-  assignee   user?        @relation(fields: [assignedTo], references: [id], onDelete: SetNull)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  replies    Reply[]
+  id           Int          @id @default(autoincrement())
+  subject      String
+  body         String
+  bodyHtml     String?
+  fromEmail    String
+  fromName     String
+  status       TicketStatus @default(New)
+  category     Category?
+  assignedTo   String?
+  assignee     user?        @relation(fields: [assignedTo], references: [id], onDelete: SetNull)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  replies      Reply[]
 }
 
 model Reply {

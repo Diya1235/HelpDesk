@@ -56,25 +56,31 @@ router.get("/", async (req, res) => {
       : { [sortBy]: sortOrder };
 
   // --- filter + search ---
-  const where: Prisma.TicketWhereInput = {};
+  const autoResolvedMode = req.query.autoResolved === "true";
 
-  const rawStatus = req.query.status as string | undefined;
-  const rawCategory = req.query.category as string | undefined;
-  const rawSearch = (req.query.search as string | undefined)?.trim();
+  const where: Prisma.TicketWhereInput = autoResolvedMode
+    ? { status: TicketStatus.Resolved, replies: { none: {} } }
+    : { status: { notIn: [TicketStatus.New, TicketStatus.Processing] } };
 
-  if (rawStatus && VALID_STATUSES.includes(rawStatus as TicketStatus)) {
-    where.status = rawStatus as TicketStatus;
-  }
-  if (rawCategory && VALID_CATEGORIES.includes(rawCategory as Category)) {
-    where.category = rawCategory as Category;
-  }
-  if (rawSearch) {
-    where.OR = [
-      { subject: { contains: rawSearch, mode: "insensitive" } },
-      { body: { contains: rawSearch, mode: "insensitive" } },
-      { fromName: { contains: rawSearch, mode: "insensitive" } },
-      { fromEmail: { contains: rawSearch, mode: "insensitive" } },
-    ];
+  if (!autoResolvedMode) {
+    const rawStatus = req.query.status as string | undefined;
+    const rawCategory = req.query.category as string | undefined;
+    const rawSearch = (req.query.search as string | undefined)?.trim();
+
+    if (rawStatus && VALID_STATUSES.includes(rawStatus as TicketStatus)) {
+      where.status = rawStatus as TicketStatus;
+    }
+    if (rawCategory && VALID_CATEGORIES.includes(rawCategory as Category)) {
+      where.category = rawCategory as Category;
+    }
+    if (rawSearch) {
+      where.OR = [
+        { subject: { contains: rawSearch, mode: "insensitive" } },
+        { body: { contains: rawSearch, mode: "insensitive" } },
+        { fromName: { contains: rawSearch, mode: "insensitive" } },
+        { fromEmail: { contains: rawSearch, mode: "insensitive" } },
+      ];
+    }
   }
 
   // --- pagination ---
@@ -220,6 +226,42 @@ router.post("/:id/replies", async (req, res) => {
   res.status(201).json(reply);
 });
 
+router.post("/:id/summarize", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid ticket ID" });
+    return;
+  }
+
+  const ticket = await db.ticket.findUnique({ where: { id }, include: TICKET_INCLUDE });
+  if (!ticket) {
+    res.status(404).json({ error: "Ticket not found" });
+    return;
+  }
+
+  if (ticket.replies.length === 0) {
+    res.status(400).json({ error: "No replies yet — nothing to summarize." });
+    return;
+  }
+
+  const thread = [
+    `Customer (${ticket.fromName}): ${ticket.body}`,
+    ...ticket.replies.map((r) => {
+      const label = r.senderType === "Agent" ? `Agent (${r.author.name})` : `Customer`;
+      return `${label}: ${r.body}`;
+    }),
+  ].join("\n\n");
+
+  const { text } = await generateText({
+    model: groq("llama-3.3-70b-versatile"),
+    system:
+      "You are a support ticket summarizer. Given a support conversation thread, write a concise summary (2–4 sentences) covering the customer's issue, what was discussed, and the current resolution status. Return only the summary with no preamble.",
+    prompt: thread,
+  });
+
+  res.json({ summary: text });
+});
+
 router.post("/:id/polish-reply", async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
@@ -233,10 +275,13 @@ router.post("/:id/polish-reply", async (req, res) => {
     return;
   }
 
+  const ticket = await db.ticket.findUnique({ where: { id }, select: { fromName: true } });
+  const customerName = (ticket?.fromName ?? "there").split(" ")[0];
+  const agentName = req.user.name ?? "Support Team";
+
   const { text } = await generateText({
     model: groq("llama-3.3-70b-versatile"),
-    system:
-      "You are a professional customer support agent. Improve the following reply to be clearer, more professional, and empathetic. Return only the improved reply text with no explanations, preamble, or formatting.",
+    system: `You are a professional customer support agent named ${agentName}. Improve the following reply to be clearer, more professional, and empathetic. Address the customer by their first name (their name is "${customerName}"). End the reply with a signature line "Best regards,\n${agentName}". Return only the improved reply text with no explanations or preamble.`,
     prompt: body,
   });
 

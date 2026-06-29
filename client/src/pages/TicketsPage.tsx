@@ -14,13 +14,15 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  Bot,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Skeleton } from "../components/ui/skeleton";
 import { TicketCategory } from "../components/TicketCategory";
-import { ticketStatusSchema, categorySchema } from "@helpdesk/core";
+import { ticketStatusSchema, agentTicketStatusSchema, categorySchema } from "@helpdesk/core";
 
 type TicketStatus = (typeof ticketStatusSchema.options)[number];
+type AgentTicketStatus = (typeof agentTicketStatusSchema.options)[number];
 type Category = (typeof categorySchema.options)[number];
 
 interface Ticket {
@@ -42,12 +44,16 @@ interface TicketsResponse {
 const PAGE_SIZE = 20;
 
 const STATUS_STYLES: Record<TicketStatus, string> = {
+  New: "bg-purple-100 text-purple-700",
+  Processing: "bg-yellow-100 text-yellow-700",
   Open: "bg-blue-100 text-blue-700",
   Resolved: "bg-green-100 text-green-700",
   Closed: "bg-gray-100 text-gray-500",
 };
 
 const STATUS_LABELS: Record<TicketStatus, string> = {
+  New: "New",
+  Processing: "Processing",
   Open: "Open",
   Resolved: "Resolved",
   Closed: "Closed",
@@ -131,9 +137,10 @@ const SELECT_CLS =
   "text-sm border border-gray-200 rounded-md px-2.5 py-1.5 text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-gray-300 cursor-pointer";
 
 export function TicketsPage() {
+  const [view, setView] = useState<"all" | "auto-resolved">("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<TicketStatus | "">("");
+  const [statusFilter, setStatusFilter] = useState<AgentTicketStatus | "">("");
   const [categoryFilter, setCategoryFilter] = useState<Category | "">("");
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -152,14 +159,26 @@ export function TicketsPage() {
       setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
     } else {
       setSortBy(columnId);
-      setSortOrder("asc");
+      setSortOrder(columnId === "createdAt" ? "desc" : "asc");
     }
     setPage(1);
   }
 
+  function switchView(next: "all" | "auto-resolved") {
+    setView(next);
+    setPage(1);
+    setSearch("");
+    setDebouncedSearch("");
+    setStatusFilter("");
+    setCategoryFilter("");
+  }
+
+  const isAutoResolved = view === "auto-resolved";
+
   const { data, isLoading, isError } = useQuery<TicketsResponse>({
     queryKey: [
       "tickets",
+      view,
       sortBy,
       sortOrder,
       statusFilter,
@@ -168,15 +187,19 @@ export function TicketsPage() {
       page,
     ],
     queryFn: () => {
-      const params: Record<string, string | number> = {
+      const params: Record<string, string | number | boolean> = {
         page,
         pageSize: PAGE_SIZE,
         sortBy,
         sortOrder,
       };
-      if (statusFilter) params.status = statusFilter;
-      if (categoryFilter) params.category = categoryFilter;
-      if (debouncedSearch) params.search = debouncedSearch;
+      if (isAutoResolved) {
+        params.autoResolved = true;
+      } else {
+        if (statusFilter) params.status = statusFilter;
+        if (categoryFilter) params.category = categoryFilter;
+        if (debouncedSearch) params.search = debouncedSearch;
+      }
       return axios
         .get<TicketsResponse>("/api/tickets", { params })
         .then((r) => r.data);
@@ -199,20 +222,44 @@ export function TicketsPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Tickets</h1>
-          {!isLoading && (
-            <p className="mt-0.5 text-sm text-gray-400">
-              {total} ticket{total !== 1 ? "s" : ""}
-              {(statusFilter || categoryFilter || debouncedSearch) &&
-                " (filtered)"}
-            </p>
-          )}
+        <div className="mb-6 flex items-end justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Tickets</h1>
+            {!isLoading && (
+              <p className="mt-0.5 text-sm text-gray-400">
+                {total} ticket{total !== 1 ? "s" : ""}
+                {!isAutoResolved && (statusFilter || categoryFilter || debouncedSearch) && " (filtered)"}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => switchView("all")}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                view === "all"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              All tickets
+            </button>
+            <button
+              onClick={() => switchView("auto-resolved")}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                view === "auto-resolved"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <Bot className="h-3.5 w-3.5" />
+              Auto-resolved
+            </button>
+          </div>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          {/* Filter bar */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+          {/* Filter bar — hidden in auto-resolved view */}
+          {!isAutoResolved && <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <input
@@ -227,13 +274,13 @@ export function TicketsPage() {
             <select
               value={statusFilter}
               onChange={(e) => {
-                setStatusFilter(e.target.value as TicketStatus | "");
+                setStatusFilter(e.target.value as AgentTicketStatus | "");
                 setPage(1);
               }}
               className={SELECT_CLS}
             >
               <option value="">All statuses</option>
-              {ticketStatusSchema.options.map((s) => (
+              {agentTicketStatusSchema.options.map((s) => (
                 <option key={s} value={s}>{STATUS_LABELS[s]}</option>
               ))}
             </select>
@@ -251,7 +298,7 @@ export function TicketsPage() {
                 <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
               ))}
             </select>
-          </div>
+          </div>}
 
           {/* Table */}
           {isLoading ? (

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
-import { ticketStatusSchema, categorySchema, type TicketStatus, type Category } from "@helpdesk/core";
+import { agentTicketStatusSchema, categorySchema, type TicketStatus, type AgentTicketStatus, type Category } from "@helpdesk/core";
 
 interface Agent {
   id: string;
@@ -15,14 +15,24 @@ interface Props {
   assignee: { id: string; name: string } | null;
 }
 
-const STATUS_LABELS: Record<TicketStatus, string> = {
+const AGENT_STATUS_LABELS: Record<AgentTicketStatus, string> = {
   Open: "Open",
   Resolved: "Resolved",
   Closed: "Closed",
 };
 
+const AI_STATUS_LABELS: Partial<Record<TicketStatus, string>> = {
+  New: "New (queued)",
+  Processing: "Processing…",
+};
+
+const AI_STATUS_STYLES: Partial<Record<TicketStatus, string>> = {
+  New: "text-purple-700 bg-purple-50 border border-purple-200",
+  Processing: "text-yellow-700 bg-yellow-50 border border-yellow-200 animate-pulse",
+};
+
 const CATEGORY_LABELS: Record<Category, string> = {
-  General: "General Question",
+  GeneralQuestion: "General Question",
   TechnicalQuestion: "Technical Question",
   RefundRequest: "Refund Request",
 };
@@ -93,17 +103,26 @@ export function UpdateTicket({ ticketId, status, category, assignee }: Props) {
 
   return (
     <div className="w-40 shrink-0 bg-white border border-gray-200 rounded-lg shadow-sm p-3 text-sm space-y-3">
-      <SideSelect
-        label="Status"
-        ariaLabel="Status"
-        value={status}
-        disabled={updateMutation.isPending}
-        onChange={(v) => updateMutation.mutate({ status: v as TicketStatus })}
-      >
-        {ticketStatusSchema.options.map((s) => (
-          <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-        ))}
-      </SideSelect>
+      {status === "New" || status === "Processing" ? (
+        <div>
+          <p className={LABEL_CLS}>Status</p>
+          <span className={`inline-block w-full rounded-md px-2.5 py-1.5 text-xs font-medium ${AI_STATUS_STYLES[status]}`}>
+            {AI_STATUS_LABELS[status]}
+          </span>
+        </div>
+      ) : (
+        <SideSelect
+          label="Status"
+          ariaLabel="Status"
+          value={status}
+          disabled={updateMutation.isPending}
+          onChange={(v) => updateMutation.mutate({ status: v as AgentTicketStatus })}
+        >
+          {agentTicketStatusSchema.options.map((s) => (
+            <option key={s} value={s}>{AGENT_STATUS_LABELS[s]}</option>
+          ))}
+        </SideSelect>
+      )}
 
       <SideSelect
         label="Category"
