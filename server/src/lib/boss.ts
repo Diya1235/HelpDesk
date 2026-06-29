@@ -4,6 +4,7 @@ import { generateText } from "ai";
 import { db } from "../db";
 import { Category, TicketStatus, SenderType } from "../generated/prisma";
 import { knowledgeBase } from "./knowledge-base";
+import { sendTicketStatusUpdateEmail } from "./email";
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -139,7 +140,7 @@ export async function startBoss(): Promise<void> {
 
       const ticket = await db.ticket.findUnique({
         where: { id: ticketId },
-        select: { fromName: true },
+        select: { fromName: true, fromEmail: true, subject: true },
       });
       const firstName = (ticket?.fromName ?? "there").split(" ")[0];
 
@@ -158,6 +159,15 @@ export async function startBoss(): Promise<void> {
           where: { id: ticketId },
           data: { status: TicketStatus.Resolved },
         });
+        if (ticket) {
+          sendTicketStatusUpdateEmail(
+            ticket.fromEmail,
+            ticket.fromName,
+            ticketId,
+            ticket.subject,
+            TicketStatus.Resolved,
+          ).catch(() => {});
+        }
         console.log(`[auto-resolve] ticket ${ticketId} → Resolved (reply created)`);
       } else {
         await db.ticket.update({

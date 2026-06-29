@@ -5,6 +5,7 @@ import { assignTicketSchema, updateTicketSchema, createReplySchema } from "@help
 import { TicketStatus, Category, SenderType, type Prisma } from "../generated/prisma";
 import { createGroq } from "@ai-sdk/groq";
 import { generateText } from "ai";
+import { sendTicketStatusUpdateEmail, sendNotificationEmail } from "../lib/email";
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -220,6 +221,16 @@ router.patch("/:id", async (req, res) => {
     include: TICKET_INCLUDE,
   });
 
+  if (parsed.data.status) {
+    sendTicketStatusUpdateEmail(
+      ticket.fromEmail,
+      ticket.fromName,
+      ticket.id,
+      ticket.subject,
+      ticket.status,
+    ).catch(() => {});
+  }
+
   res.json(ticket);
 });
 
@@ -277,6 +288,15 @@ router.post("/:id/replies", async (req, res) => {
     },
     include: { author: { select: { id: true, name: true, role: true } } },
   });
+
+  if (senderType === SenderType.Agent) {
+    sendNotificationEmail(
+      ticket.fromEmail,
+      ticket.fromName,
+      `Re: ${ticket.subject}`,
+      `You have a new reply on your support ticket #${id}.\n\n${parsed.data.body}`,
+    ).catch(() => {});
+  }
 
   res.status(201).json(reply);
 });
