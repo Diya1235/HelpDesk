@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: hitman
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: helpdesk
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -22,14 +22,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file: .env.docker
     environment:
       NODE_ENV: production
       PORT: 3001
-      DATABASE_URL: postgresql://postgres:hitman@db:5432/helpdesk
-      BETTER_AUTH_SECRET: XbXOIDVt2a6852NACg6XEwLxIE0+xh2NdUhk1lDaUho=
-      BETTER_AUTH_URL: http://localhost:3001
-      GROQ_API_KEY: your-groq-api-key-here
-      SENTRY_DSN: ""
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/helpdesk
 
 volumes:
   pgdata:
