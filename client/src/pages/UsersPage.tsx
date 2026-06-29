@@ -18,14 +18,14 @@ export function UsersPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+            <h1 className="text-2xl font-bold text-foreground">Users</h1>
             {!isLoading && (
-              <p className="mt-0.5 text-sm text-gray-400">
+              <p className="mt-0.5 text-sm text-muted-foreground">
                 {users.length} member{users.length !== 1 ? "s" : ""}
               </p>
             )}
@@ -38,7 +38,7 @@ export function UsersPage() {
 
         <CreateUserModal open={showModal} onClose={() => setShowModal(false)} />
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
           <UsersTable
             users={users}
             isLoading={isLoading}

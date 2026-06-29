@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, FileText, RefreshCw } from "lucide-react";
+import { ChevronLeft, FileText, RefreshCw, Sparkles } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Navbar } from "../components/Navbar";
@@ -11,7 +11,7 @@ import { ReplyThread } from "../components/ReplyThread";
 import { UpdateTicket } from "../components/UpdateTicket";
 import { createReplySchema, type CreateReply, type Reply, type Ticket } from "@helpdesk/core";
 
-const LABEL_CLS = "text-xs font-medium text-gray-500 mb-1";
+const LABEL_CLS = "text-xs font-medium text-muted-foreground mb-1";
 
 export function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -65,12 +65,12 @@ export function TicketDetailPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-8">
         <Link
           to="/tickets"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-6"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
         >
           <ChevronLeft className="h-4 w-4" />
           Back to tickets
@@ -78,7 +78,7 @@ export function TicketDetailPage() {
 
         {isLoading ? (
           <div className="flex gap-5 items-start">
-            <div className="flex-1 min-w-0 bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-4">
+            <div className="flex-1 min-w-0 bg-card border border-border rounded-lg shadow-sm p-6 space-y-4">
               <Skeleton className="h-7 w-2/3" />
               <Skeleton className="h-4 w-48" />
               <Skeleton className="h-4 w-36" />
@@ -86,7 +86,7 @@ export function TicketDetailPage() {
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
             </div>
-            <div className="w-40 shrink-0 bg-white border border-gray-200 rounded-lg shadow-sm p-3 space-y-3">
+            <div className="w-40 shrink-0 bg-card border border-border rounded-lg shadow-sm p-3 space-y-3">
               <Skeleton className="h-3 w-10" />
               <Skeleton className="h-7 w-full rounded-md" />
               <Skeleton className="h-3 w-14" />
@@ -96,12 +96,12 @@ export function TicketDetailPage() {
             </div>
           </div>
         ) : isError ? (
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-10 text-center text-sm text-red-500">
+          <div className="bg-card border border-border rounded-lg shadow-sm p-10 text-center text-sm text-red-500">
             Ticket not found or failed to load.
           </div>
         ) : ticket ? (
           <div className="flex gap-5 items-start">
-            <div className="flex-1 min-w-0 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="flex-1 min-w-0 bg-card border border-border rounded-lg shadow-sm">
               <TicketDetail
                 subject={ticket.subject}
                 fromName={ticket.fromName}
@@ -113,7 +113,7 @@ export function TicketDetailPage() {
               />
 
               {/* Summary section */}
-              <div className="px-6 py-4 border-b border-gray-100">
+              <div className="px-6 py-4 border-b border-border">
                 <div className="flex items-center justify-between mb-2">
                   <p className={LABEL_CLS}>Conversation Summary</p>
                   {summarizeMutation.data && (
@@ -121,7 +121,7 @@ export function TicketDetailPage() {
                       type="button"
                       onClick={() => summarizeMutation.mutate()}
                       disabled={summarizeMutation.isPending}
-                      className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <RefreshCw className="h-3 w-3" />
                       Regenerate
@@ -129,17 +129,17 @@ export function TicketDetailPage() {
                   )}
                 </div>
                 {summarizeMutation.data ? (
-                  <p className="text-sm text-gray-700 leading-relaxed bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                  <p className="text-sm text-foreground leading-relaxed bg-muted border border-border rounded-lg px-4 py-3">
                     {summarizeMutation.data.summary}
                   </p>
                 ) : ticket.replies.length === 0 ? (
-                  <p className="text-xs text-gray-400 italic">No replies yet — nothing to summarize.</p>
+                  <p className="text-xs text-muted-foreground italic">No replies yet — nothing to summarize.</p>
                 ) : (
                   <button
                     type="button"
                     onClick={() => summarizeMutation.mutate()}
                     disabled={summarizeMutation.isPending}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-foreground border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FileText className="h-4 w-4" />
                     {summarizeMutation.isPending ? "Summarizing…" : "Summarize conversation"}
@@ -160,22 +160,26 @@ export function TicketDetailPage() {
                     {...register("body")}
                     rows={4}
                     placeholder="Write a reply..."
-                    className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 bg-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 resize-none disabled:opacity-50"
+                    className="w-full text-sm border border-input rounded-lg px-3 py-2.5 text-foreground bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none disabled:opacity-50"
                     disabled={replyMutation.isPending}
                   />
+                  {errors.body && (
+                    <p className="text-xs text-destructive">{errors.body.message}</p>
+                  )}
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => polishMutation.mutate(getValues("body"))}
                       disabled={!replyBody.trim() || polishMutation.isPending || replyMutation.isPending}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {polishMutation.isPending ? "Polishing…" : "✨ Polish"}
+                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                      {polishMutation.isPending ? "Polishing…" : "Polish"}
                     </button>
                     <button
                       type="submit"
                       disabled={!replyBody.trim() || replyMutation.isPending || polishMutation.isPending}
-                      className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {replyMutation.isPending ? "Sending…" : "Send Reply"}
                     </button>

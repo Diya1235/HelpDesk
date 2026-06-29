@@ -27,8 +27,8 @@ const AI_STATUS_LABELS: Partial<Record<TicketStatus, string>> = {
 };
 
 const AI_STATUS_STYLES: Partial<Record<TicketStatus, string>> = {
-  New: "text-purple-700 bg-purple-50 border border-purple-200",
-  Processing: "text-yellow-700 bg-yellow-50 border border-yellow-200 animate-pulse",
+  New: "text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-300 dark:bg-purple-950 dark:border-purple-800",
+  Processing: "text-yellow-700 bg-yellow-50 border border-yellow-200 animate-pulse dark:text-yellow-300 dark:bg-yellow-950 dark:border-yellow-800",
 };
 
 const CATEGORY_LABELS: Record<Category, string> = {
@@ -37,9 +37,9 @@ const CATEGORY_LABELS: Record<Category, string> = {
   RefundRequest: "Refund Request",
 };
 
-const LABEL_CLS = "text-xs font-medium text-gray-500 mb-1";
+const LABEL_CLS = "text-xs font-medium text-muted-foreground mb-1";
 const SELECT_CLS =
-  "w-full appearance-none text-sm border border-gray-200 rounded-md pl-2.5 pr-7 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-gray-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
+  "w-full appearance-none text-sm border border-input rounded-md pl-2.5 pr-7 py-1.5 text-foreground bg-background focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
 
 function SideSelect({
   label,
@@ -69,7 +69,7 @@ function SideSelect({
         >
           {children}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
       </div>
     </div>
   );
@@ -102,7 +102,7 @@ export function UpdateTicket({ ticketId, status, category, assignee }: Props) {
   });
 
   return (
-    <div className="w-40 shrink-0 bg-white border border-gray-200 rounded-lg shadow-sm p-3 text-sm space-y-3">
+    <div className="w-40 shrink-0 bg-card border border-border rounded-lg shadow-sm p-3 text-sm space-y-3">
       {status === "New" || status === "Processing" ? (
         <div>
           <p className={LABEL_CLS}>Status</p>

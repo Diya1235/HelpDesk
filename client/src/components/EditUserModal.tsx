@@ -88,7 +88,7 @@ export function EditUserModal({ user, onClose }: Props) {
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor="edit-password">New password <span className="text-gray-400 font-normal">(leave blank to keep current)</span></Label>
+            <Label htmlFor="edit-password">New password <span className="text-muted-foreground font-normal">(leave blank to keep current)</span></Label>
             <Input id="edit-password" type="password" placeholder="Min 8 characters" aria-invalid={!!errors.password} {...register("password")} />
             {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
           </div>

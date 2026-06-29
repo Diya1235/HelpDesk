@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { hashPassword } from "better-auth/crypto";
 import { createUserSchema, updateRoleSchema, editUserSchema } from "@helpdesk/core";
 import { db } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
@@ -79,7 +80,7 @@ router.patch("/:id", async (req, res) => {
   });
 
   if (password) {
-    const hashedPassword = await Bun.password.hash(password);
+    const hashedPassword = await hashPassword(password);
     await db.account.updateMany({
       where: { userId: id, providerId: "credential" },
       data: { password: hashedPassword },

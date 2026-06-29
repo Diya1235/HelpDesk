@@ -52,10 +52,10 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
 
   const headers = (
     <tr>
-      <th className="text-left px-4 py-3 font-medium text-gray-500">Name</th>
-      <th className="text-left px-4 py-3 font-medium text-gray-500">Email</th>
-      <th className="text-left px-4 py-3 font-medium text-gray-500">Role</th>
-      <th className="text-left px-4 py-3 font-medium text-gray-500">Joined</th>
+      <th className="text-left px-4 py-3 font-medium text-muted-foreground">Name</th>
+      <th className="text-left px-4 py-3 font-medium text-muted-foreground">Email</th>
+      <th className="text-left px-4 py-3 font-medium text-muted-foreground">Role</th>
+      <th className="text-left px-4 py-3 font-medium text-muted-foreground">Joined</th>
       <th className="w-20 px-4 py-3" />
     </tr>
   );
@@ -63,8 +63,8 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
   if (isLoading) {
     return (
       <table className="w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-100">{headers}</thead>
-        <tbody className="divide-y divide-gray-50">
+        <thead className="bg-muted border-b border-border">{headers}</thead>
+        <tbody className="divide-y divide-border">
           {Array.from({ length: 4 }).map((_, i) => (
             <tr key={i}>
               <td className="px-4 py-3"><Skeleton className="h-4 w-28" /></td>
@@ -84,35 +84,35 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
   }
 
   if (users.length === 0) {
-    return <div className="p-10 text-center text-sm text-gray-400">No users yet.</div>;
+    return <div className="p-10 text-center text-sm text-muted-foreground">No users yet.</div>;
   }
 
   return (
     <>
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 border-b border-gray-100">{headers}</thead>
-      <tbody className="divide-y divide-gray-50">
+      <thead className="bg-muted border-b border-border">{headers}</thead>
+      <tbody className="divide-y divide-border">
         {users.map((user) => (
-          <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-            <td className="px-4 py-3 font-medium text-gray-900">
+          <tr key={user.id} className="hover:bg-muted transition-colors">
+            <td className="px-4 py-3 font-medium text-foreground">
               {user.name}
               {user.id === currentUserId && (
-                <span className="ml-2 text-xs text-gray-400">(you)</span>
+                <span className="ml-2 text-xs text-muted-foreground">(you)</span>
               )}
             </td>
-            <td className="px-4 py-3 text-gray-500">{user.email}</td>
+            <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
             <td className="px-4 py-3">
               <span
                 className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                   user.role === "admin"
-                    ? "bg-violet-100 text-violet-700"
-                    : "bg-gray-100 text-gray-600"
+                    ? "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300"
+                    : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                 }`}
               >
                 {user.role}
               </span>
             </td>
-            <td className="px-4 py-3 text-gray-400 tabular-nums">
+            <td className="px-4 py-3 text-muted-foreground tabular-nums">
               {new Date(user.createdAt).toLocaleDateString()}
             </td>
             <td className="px-4 py-3">
@@ -121,7 +121,7 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
                   <button
                     onClick={() => setEditingUser(user)}
                     title="Edit user"
-                    className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                    className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
@@ -129,7 +129,7 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
                     onClick={() => toggleRole.mutate(user)}
                     disabled={toggleRole.isPending && toggleRole.variables?.id === user.id}
                     title={`Make ${user.role === "admin" ? "agent" : "admin"}`}
-                    className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-40 transition-colors"
+                    className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 transition-colors"
                   >
                     <ArrowLeftRight className="w-3.5 h-3.5" />
                   </button>
@@ -137,7 +137,7 @@ export function UsersTable({ users, isLoading, isError, currentUserId }: Props) 
                     onClick={() => handleDelete(user.id)}
                     disabled={deleteUser.isPending && deleteUser.variables === user.id}
                     title="Delete user"
-                    className="p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 disabled:opacity-40 transition-colors"
+                    className="p-1.5 rounded text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 disabled:opacity-40 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

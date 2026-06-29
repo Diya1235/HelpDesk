@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Inbox, AlertCircle, Bot, Zap, Clock } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 
 interface DashboardStats {
@@ -21,12 +22,15 @@ function formatDuration(minutes: number): string {
   return `${(minutes / 1440).toFixed(1)}d`;
 }
 
-function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+type LucideIcon = React.ComponentType<{ className?: string }>;
+
+function StatCard({ label, value, sub, icon: Icon }: { label: string; value: string; sub?: string; icon?: LucideIcon }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4 flex flex-col gap-1 min-w-0">
-      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide whitespace-nowrap">{label}</span>
-      <span className="text-2xl font-bold text-gray-900 mt-0.5">{value}</span>
-      {sub && <span className="text-xs text-gray-400">{sub}</span>}
+    <div className="bg-card rounded-xl border border-border shadow-sm px-5 py-4 flex flex-col gap-1 min-w-0">
+      {Icon && <Icon className="h-4 w-4 text-primary mb-0.5" />}
+      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{label}</span>
+      <span className="text-2xl font-bold text-foreground mt-0.5">{value}</span>
+      {sub && <span className="text-xs text-muted-foreground">{sub}</span>}
     </div>
   );
 }
@@ -40,8 +44,8 @@ function BarChart({ data }: { data: DailyCount[] }) {
   const totalW = data.length * (barW + gap) - gap;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-      <h2 className="text-sm font-semibold text-gray-700 mb-4">Tickets per day — last 30 days</h2>
+    <div className="bg-card rounded-xl border border-border shadow-sm p-6">
+      <h2 className="text-sm font-semibold text-muted-foreground mb-4">Tickets per day — last 30 days</h2>
       <svg
         viewBox={`0 0 ${totalW} ${chartH + 24}`}
         className="w-full overflow-visible"
@@ -64,7 +68,7 @@ function BarChart({ data }: { data: DailyCount[] }) {
                 width={barW}
                 height={barH}
                 rx={2}
-                fill="#6366f1"
+                style={{ fill: "var(--primary)" }}
                 opacity={0.85}
               />
               {showLabel && (
@@ -73,8 +77,8 @@ function BarChart({ data }: { data: DailyCount[] }) {
                   y={chartH + 16}
                   textAnchor="middle"
                   fontSize={9}
-                  fill="#9ca3af"
                   fontFamily="sans-serif"
+                  style={{ fill: "var(--muted-foreground)" }}
                 >
                   {label}
                 </text>
@@ -82,7 +86,7 @@ function BarChart({ data }: { data: DailyCount[] }) {
             </g>
           );
         })}
-        <line x1={0} y1={chartH} x2={totalW} y2={chartH} stroke="#e5e7eb" strokeWidth={1} />
+        <line x1={0} y1={chartH} x2={totalW} y2={chartH} strokeWidth={1} style={{ stroke: "var(--border)" }} />
       </svg>
     </div>
   );
@@ -104,24 +108,26 @@ export function HomePage() {
   const loading = isLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Dashboard</h1>
-        <p className="text-sm text-gray-500 mb-6">Live ticket metrics</p>
+        <h1 className="text-2xl font-bold text-foreground mb-1">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mb-6">Live ticket metrics</p>
 
         {isError && <p className="text-sm text-red-500 mb-4">Failed to load stats.</p>}
 
         <div className="grid grid-cols-5 gap-3 mb-6">
-          <StatCard label="Total tickets" value={loading ? "—" : String(stats!.totalTickets)} />
-          <StatCard label="Open tickets" value={loading ? "—" : String(stats!.openTickets)} sub="status = Open" />
-          <StatCard label="AI resolved" value={loading ? "—" : String(stats!.aiResolvedCount)} sub="no agent reply" />
+          <StatCard icon={Inbox} label="Total tickets" value={loading ? "—" : String(stats!.totalTickets)} />
+          <StatCard icon={AlertCircle} label="Open tickets" value={loading ? "—" : String(stats!.openTickets)} sub="status = Open" />
+          <StatCard icon={Bot} label="AI resolved" value={loading ? "—" : String(stats!.aiResolvedCount)} sub="no agent reply" />
           <StatCard
+            icon={Zap}
             label="AI rate"
             value={loading ? "—" : `${stats!.aiResolvedPercent.toFixed(1)}%`}
             sub="of all tickets"
           />
           <StatCard
+            icon={Clock}
             label="Avg resolution"
             value={
               loading
