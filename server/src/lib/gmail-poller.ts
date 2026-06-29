@@ -45,10 +45,12 @@ async function pollOnce(user: string, password: string): Promise<void> {
       for (const uid of uids) {
         try {
           // Fetch full source of this message
-          const msgData = await client.fetchOne({ uid } as unknown as string, { source: true }, { uid: true });
-          if (!msgData || !("source" in msgData) || !msgData.source) continue;
+          const msgData = await client.fetchOne(String(uid), { source: true }, { uid: true });
+          if (!msgData || typeof msgData === "boolean") continue;
+          const source = (msgData as unknown as Record<string, unknown>)["source"] as Buffer | undefined;
+          if (!source) continue;
 
-          const parsed = await simpleParser(msgData.source as Buffer);
+          const parsed = await simpleParser(source);
 
           const fromStr = parsed.from?.text ?? "";
           if (!fromStr) continue;
@@ -57,7 +59,7 @@ async function pollOnce(user: string, password: string): Promise<void> {
 
           // Skip self-sent emails to prevent loops
           if (fromEmail.toLowerCase() === user.toLowerCase()) {
-            await client.messageFlagsAdd({ uid }, ["\\Seen"], { uid: true });
+            await client.messageFlagsAdd(String(uid), ["\\Seen"], { uid: true });
             continue;
           }
 
@@ -70,7 +72,7 @@ async function pollOnce(user: string, password: string): Promise<void> {
           });
 
           // Mark as read only after ticket is safely created
-          await client.messageFlagsAdd({ uid }, ["\\Seen"], { uid: true });
+          await client.messageFlagsAdd(String(uid), ["\\Seen"], { uid: true });
 
           console.log(`[gmail] ticket #${ticket.id} created from ${fromEmail}`);
 
