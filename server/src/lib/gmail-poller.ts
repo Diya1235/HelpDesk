@@ -36,20 +36,16 @@ async function pollOnce(user: string, password: string): Promise<void> {
     const lock = await client.getMailboxLock("INBOX");
 
     try {
-      // Collect UIDs of unseen messages first
-      const uids: number[] = [];
-      for await (const msg of client.fetch({ seen: false }, { uid: true })) {
-        uids.push(msg.uid);
+      // Collect UID + source for all unseen messages in one pass
+      const toProcess: Array<{ uid: number; source: Buffer }> = [];
+      for await (const msg of client.fetch({ seen: false }, { uid: true, source: true })) {
+        if (msg.uid && msg.source) {
+          toProcess.push({ uid: msg.uid, source: msg.source as Buffer });
+        }
       }
 
-      for (const uid of uids) {
+      for (const { uid, source } of toProcess) {
         try {
-          // Fetch full source of this message
-          const msgData = await client.fetchOne(String(uid), { source: true }, { uid: true });
-          if (!msgData || typeof msgData === "boolean") continue;
-          const source = (msgData as unknown as Record<string, unknown>)["source"] as Buffer | undefined;
-          if (!source) continue;
-
           const parsed = await simpleParser(source);
 
           const fromStr = parsed.from?.text ?? "";
@@ -57,7 +53,6 @@ async function pollOnce(user: string, password: string): Promise<void> {
 
           const { email: fromEmail, name: fromName } = parseFrom(fromStr);
 
-          // Skip self-sent emails to prevent loops
           if (fromEmail.toLowerCase() === user.toLowerCase()) {
             await client.messageFlagsAdd(String(uid), ["\\Seen"], { uid: true });
             continue;
