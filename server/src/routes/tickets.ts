@@ -105,6 +105,56 @@ router.get("/", async (req, res) => {
   res.json({ tickets, total });
 });
 
+router.get("/daily", async (_req, res) => {
+  const since = new Date();
+  since.setDate(since.getDate() - 29);
+  since.setHours(0, 0, 0, 0);
+
+  const tickets = await db.ticket.findMany({
+    where: { createdAt: { gte: since } },
+    select: { createdAt: true },
+  });
+
+  const counts: Record<string, number> = {};
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(since);
+    d.setDate(since.getDate() + i);
+    counts[d.toISOString().slice(0, 10)] = 0;
+  }
+  for (const t of tickets) {
+    const key = t.createdAt.toISOString().slice(0, 10);
+    if (key in counts) counts[key]++;
+  }
+
+  const data = Object.entries(counts).map(([date, count]) => ({ date, count }));
+  res.json(data);
+});
+
+router.get("/stats", async (_req, res) => {
+  const [totalTickets, openTickets, aiResolvedCount, resolvedWithTime] = await Promise.all([
+    db.ticket.count(),
+    db.ticket.count({ where: { status: TicketStatus.Open } }),
+    db.ticket.count({ where: { status: TicketStatus.Resolved, replies: { none: {} } } }),
+    db.ticket.findMany({
+      where: { resolvedAt: { not: null } },
+      select: { createdAt: true, resolvedAt: true },
+    }),
+  ]);
+
+  const aiResolvedPercent = totalTickets > 0 ? (aiResolvedCount / totalTickets) * 100 : 0;
+
+  let avgResolutionMinutes: number | null = null;
+  if (resolvedWithTime.length > 0) {
+    const totalMs = resolvedWithTime.reduce(
+      (sum, t) => sum + (t.resolvedAt!.getTime() - t.createdAt.getTime()),
+      0,
+    );
+    avgResolutionMinutes = totalMs / resolvedWithTime.length / (1000 * 60);
+  }
+
+  res.json({ totalTickets, openTickets, aiResolvedCount, aiResolvedPercent, avgResolutionMinutes });
+});
+
 router.get("/agents", async (_req, res) => {
   const agents = await db.user.findMany({
     where: { role: "agent" },
@@ -159,9 +209,14 @@ router.patch("/:id", async (req, res) => {
     return;
   }
 
+  const updateData: Prisma.TicketUpdateInput = { ...parsed.data };
+  if (parsed.data.status === "Resolved" || parsed.data.status === "Closed") {
+    updateData.resolvedAt = new Date();
+  }
+
   const ticket = await db.ticket.update({
     where: { id },
-    data: parsed.data,
+    data: updateData,
     include: TICKET_INCLUDE,
   });
 

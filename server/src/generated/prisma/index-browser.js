@@ -170,7 +170,8 @@ exports.Prisma.TicketScalarFieldEnum = {
   category: 'category',
   assignedTo: 'assignedTo',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt'
 };
 
 exports.Prisma.ReplyScalarFieldEnum = {

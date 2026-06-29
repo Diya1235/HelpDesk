@@ -4945,6 +4945,7 @@ export namespace Prisma {
     assignedTo: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    resolvedAt: Date | null
   }
 
   export type TicketMaxAggregateOutputType = {
@@ -4959,6 +4960,7 @@ export namespace Prisma {
     assignedTo: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    resolvedAt: Date | null
   }
 
   export type TicketCountAggregateOutputType = {
@@ -4973,6 +4975,7 @@ export namespace Prisma {
     assignedTo: number
     createdAt: number
     updatedAt: number
+    resolvedAt: number
     _all: number
   }
 
@@ -4997,6 +5000,7 @@ export namespace Prisma {
     assignedTo?: true
     createdAt?: true
     updatedAt?: true
+    resolvedAt?: true
   }
 
   export type TicketMaxAggregateInputType = {
@@ -5011,6 +5015,7 @@ export namespace Prisma {
     assignedTo?: true
     createdAt?: true
     updatedAt?: true
+    resolvedAt?: true
   }
 
   export type TicketCountAggregateInputType = {
@@ -5025,6 +5030,7 @@ export namespace Prisma {
     assignedTo?: true
     createdAt?: true
     updatedAt?: true
+    resolvedAt?: true
     _all?: true
   }
 
@@ -5126,6 +5132,7 @@ export namespace Prisma {
     assignedTo: string | null
     createdAt: Date
     updatedAt: Date
+    resolvedAt: Date | null
     _count: TicketCountAggregateOutputType | null
     _avg: TicketAvgAggregateOutputType | null
     _sum: TicketSumAggregateOutputType | null
@@ -5159,6 +5166,7 @@ export namespace Prisma {
     assignedTo?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    resolvedAt?: boolean
     assignee?: boolean | Ticket$assigneeArgs<ExtArgs>
     replies?: boolean | Ticket$repliesArgs<ExtArgs>
     _count?: boolean | TicketCountOutputTypeDefaultArgs<ExtArgs>
@@ -5176,6 +5184,7 @@ export namespace Prisma {
     assignedTo?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    resolvedAt?: boolean
     assignee?: boolean | Ticket$assigneeArgs<ExtArgs>
   }, ExtArgs["result"]["ticket"]>
 
@@ -5191,6 +5200,7 @@ export namespace Prisma {
     assignedTo?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    resolvedAt?: boolean
     assignee?: boolean | Ticket$assigneeArgs<ExtArgs>
   }, ExtArgs["result"]["ticket"]>
 
@@ -5206,9 +5216,10 @@ export namespace Prisma {
     assignedTo?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    resolvedAt?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "subject" | "body" | "bodyHtml" | "fromEmail" | "fromName" | "status" | "category" | "assignedTo" | "createdAt" | "updatedAt", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "subject" | "body" | "bodyHtml" | "fromEmail" | "fromName" | "status" | "category" | "assignedTo" | "createdAt" | "updatedAt" | "resolvedAt", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     assignee?: boolean | Ticket$assigneeArgs<ExtArgs>
     replies?: boolean | Ticket$repliesArgs<ExtArgs>
@@ -5239,6 +5250,7 @@ export namespace Prisma {
       assignedTo: string | null
       createdAt: Date
       updatedAt: Date
+      resolvedAt: Date | null
     }, ExtArgs["result"]["ticket"]>
     composites: {}
   }
@@ -5675,6 +5687,7 @@ export namespace Prisma {
     readonly assignedTo: FieldRef<"Ticket", 'String'>
     readonly createdAt: FieldRef<"Ticket", 'DateTime'>
     readonly updatedAt: FieldRef<"Ticket", 'DateTime'>
+    readonly resolvedAt: FieldRef<"Ticket", 'DateTime'>
   }
     
 
@@ -8342,7 +8355,8 @@ export namespace Prisma {
     category: 'category',
     assignedTo: 'assignedTo',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    resolvedAt: 'resolvedAt'
   };
 
   export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
@@ -8783,6 +8797,7 @@ export namespace Prisma {
     assignedTo?: StringNullableFilter<"Ticket"> | string | null
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
     assignee?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     replies?: ReplyListRelationFilter
   }
@@ -8799,6 +8814,7 @@ export namespace Prisma {
     assignedTo?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
     assignee?: userOrderByWithRelationInput
     replies?: ReplyOrderByRelationAggregateInput
   }
@@ -8818,6 +8834,7 @@ export namespace Prisma {
     assignedTo?: StringNullableFilter<"Ticket"> | string | null
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
     assignee?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     replies?: ReplyListRelationFilter
   }, "id">
@@ -8834,6 +8851,7 @@ export namespace Prisma {
     assignedTo?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
     _count?: TicketCountOrderByAggregateInput
     _avg?: TicketAvgOrderByAggregateInput
     _max?: TicketMaxOrderByAggregateInput
@@ -8856,6 +8874,7 @@ export namespace Prisma {
     assignedTo?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"Ticket"> | Date | string | null
   }
 
   export type ReplyWhereInput = {
@@ -9275,6 +9294,7 @@ export namespace Prisma {
     category?: $Enums.Category | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
     assignee?: userCreateNestedOneWithoutTicketsInput
     replies?: ReplyCreateNestedManyWithoutTicketInput
   }
@@ -9291,6 +9311,7 @@ export namespace Prisma {
     assignedTo?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
     replies?: ReplyUncheckedCreateNestedManyWithoutTicketInput
   }
 
@@ -9304,6 +9325,7 @@ export namespace Prisma {
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignee?: userUpdateOneWithoutTicketsNestedInput
     replies?: ReplyUpdateManyWithoutTicketNestedInput
   }
@@ -9320,6 +9342,7 @@ export namespace Prisma {
     assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     replies?: ReplyUncheckedUpdateManyWithoutTicketNestedInput
   }
 
@@ -9335,6 +9358,7 @@ export namespace Prisma {
     assignedTo?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
   }
 
   export type TicketUpdateManyMutationInput = {
@@ -9347,6 +9371,7 @@ export namespace Prisma {
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TicketUncheckedUpdateManyInput = {
@@ -9361,6 +9386,7 @@ export namespace Prisma {
     assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type ReplyCreateInput = {
@@ -9843,6 +9869,7 @@ export namespace Prisma {
     assignedTo?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    resolvedAt?: SortOrder
   }
 
   export type TicketAvgOrderByAggregateInput = {
@@ -9861,6 +9888,7 @@ export namespace Prisma {
     assignedTo?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    resolvedAt?: SortOrder
   }
 
   export type TicketMinOrderByAggregateInput = {
@@ -9875,6 +9903,7 @@ export namespace Prisma {
     assignedTo?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    resolvedAt?: SortOrder
   }
 
   export type TicketSumOrderByAggregateInput = {
@@ -10654,6 +10683,7 @@ export namespace Prisma {
     category?: $Enums.Category | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
     replies?: ReplyCreateNestedManyWithoutTicketInput
   }
 
@@ -10668,6 +10698,7 @@ export namespace Prisma {
     category?: $Enums.Category | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
     replies?: ReplyUncheckedCreateNestedManyWithoutTicketInput
   }
 
@@ -10804,6 +10835,7 @@ export namespace Prisma {
     assignedTo?: StringNullableFilter<"Ticket"> | string | null
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
   }
 
   export type ReplyUpsertWithWhereUniqueWithoutAuthorInput = {
@@ -11137,6 +11169,7 @@ export namespace Prisma {
     category?: $Enums.Category | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
     assignee?: userCreateNestedOneWithoutTicketsInput
   }
 
@@ -11152,6 +11185,7 @@ export namespace Prisma {
     assignedTo?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
   }
 
   export type TicketCreateOrConnectWithoutRepliesInput = {
@@ -11219,6 +11253,7 @@ export namespace Prisma {
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignee?: userUpdateOneWithoutTicketsNestedInput
   }
 
@@ -11234,6 +11269,7 @@ export namespace Prisma {
     assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type sessionCreateManyUserInput = {
@@ -11272,6 +11308,7 @@ export namespace Prisma {
     category?: $Enums.Category | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    resolvedAt?: Date | string | null
   }
 
   export type ReplyCreateManyAuthorInput = {
@@ -11368,6 +11405,7 @@ export namespace Prisma {
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     replies?: ReplyUpdateManyWithoutTicketNestedInput
   }
 
@@ -11382,6 +11420,7 @@ export namespace Prisma {
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     replies?: ReplyUncheckedUpdateManyWithoutTicketNestedInput
   }
 
@@ -11396,6 +11435,7 @@ export namespace Prisma {
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type ReplyUpdateWithoutAuthorInput = {

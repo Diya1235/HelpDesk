@@ -89,6 +89,7 @@ model Ticket {
   assignee     user?        @relation(fields: [assignedTo], references: [id], onDelete: SetNull)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  resolvedAt   DateTime?
   replies      Reply[]
 }
 
