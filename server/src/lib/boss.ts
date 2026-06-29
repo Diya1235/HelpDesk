@@ -4,7 +4,7 @@ import { generateText } from "ai";
 import { db } from "../db";
 import { Category, TicketStatus, SenderType } from "../generated/prisma";
 import { knowledgeBase } from "./knowledge-base";
-import { sendTicketStatusUpdateEmail } from "./email";
+import { sendNotificationEmail } from "./email";
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -160,12 +160,11 @@ export async function startBoss(): Promise<void> {
           data: { status: TicketStatus.Resolved },
         });
         if (ticket) {
-          sendTicketStatusUpdateEmail(
+          sendNotificationEmail(
             ticket.fromEmail,
             ticket.fromName,
-            ticketId,
-            ticket.subject,
-            TicketStatus.Resolved,
+            `Re: ${ticket.subject}`,
+            kb.reply,
           ).catch(() => {});
         }
         console.log(`[auto-resolve] ticket ${ticketId} → Resolved (reply created)`);
