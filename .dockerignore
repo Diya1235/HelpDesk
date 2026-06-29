@@ -1,0 +1,15 @@
+node_modules
+*/node_modules
+.git
+.env
+.env.local
+.env.test
+server/.env
+server/prisma/.env
+*.log
+.DS_Store
+playwright-report/
+e2e/test-results/
+dist/
+client/dist/
+server/dist/

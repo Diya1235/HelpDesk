@@ -8,6 +8,7 @@ Sentry.init({
 
 import express from "express";
 import cors from "cors";
+import path from "path";
 import { rateLimit } from "express-rate-limit";
 import { toNodeHandler } from "better-auth/node";
 import { db } from "./db";
@@ -90,6 +91,14 @@ app.get("/api/health", async (_req, res) => {
     res.status(503).json({ status: "error", db: "disconnected" });
   }
 });
+
+if (process.env["NODE_ENV"] === "production") {
+  const clientDist = path.join(process.cwd(), "../client/dist");
+  app.use(express.static(clientDist));
+  app.get("/*splat", (_req, res) => {
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
 
 Sentry.setupExpressErrorHandler(app);
 app.use(errorHandler);
