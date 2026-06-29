@@ -2,9 +2,9 @@
   "name": "server",
   "private": true,
   "scripts": {
-    "dev": "bun run --env-file=../.env --watch src/index.ts",
+    "dev": "bun run --env-file=./.env --watch src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
-    "start": "bun run --env-file=../.env dist/index.js",
+    "start": "bun run --env-file=./.env dist/index.js",
     "typecheck": "tsc --noEmit",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
@@ -15,8 +15,10 @@
     "db:seed:test": "bun run --env-file=../.env.test prisma/seed.ts"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^4.0.1",
     "@helpdesk/core": "workspace:*",
     "@prisma/client": "6.19.2",
+    "ai": "^7.0.4",
     "better-auth": "^1.6.22",
     "cors": "^2.8.5",
     "express": "^5.1.0",

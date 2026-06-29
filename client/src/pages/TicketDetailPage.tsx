@@ -27,10 +27,20 @@ export function TicketDetailPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<CreateReply>({
     resolver: zodResolver(createReplySchema),
     mode: "onChange",
+  });
+
+  const polishMutation = useMutation({
+    mutationFn: (body: string) =>
+      axios
+        .post<{ body: string }>(`/api/tickets/${id}/polish-reply`, { body })
+        .then((r) => r.data),
+    onSuccess: (data) => setValue("body", data.body),
   });
 
   const replyMutation = useMutation({
@@ -111,10 +121,18 @@ export function TicketDetailPage() {
                   {errors.body && (
                     <p className="text-xs text-red-500">{errors.body.message}</p>
                   )}
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => polishMutation.mutate(getValues("body"))}
+                      disabled={polishMutation.isPending || replyMutation.isPending}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {polishMutation.isPending ? "Polishing…" : "✨ Polish"}
+                    </button>
                     <button
                       type="submit"
-                      disabled={replyMutation.isPending}
+                      disabled={replyMutation.isPending || polishMutation.isPending}
                       className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {replyMutation.isPending ? "Sending…" : "Send Reply"}

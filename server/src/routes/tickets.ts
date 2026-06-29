@@ -3,6 +3,10 @@ import { db } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
 import { assignTicketSchema, updateTicketSchema, createReplySchema } from "@helpdesk/core";
 import { TicketStatus, Category, SenderType, type Prisma } from "../generated/prisma";
+import { createGroq } from "@ai-sdk/groq";
+import { generateText } from "ai";
+
+const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
 const router = Router();
 
@@ -214,6 +218,29 @@ router.post("/:id/replies", async (req, res) => {
   });
 
   res.status(201).json(reply);
+});
+
+router.post("/:id/polish-reply", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid ticket ID" });
+    return;
+  }
+
+  const body = req.body?.body;
+  if (!body || typeof body !== "string" || body.trim().length === 0) {
+    res.status(400).json({ error: "Reply body is required" });
+    return;
+  }
+
+  const { text } = await generateText({
+    model: groq("llama-3.3-70b-versatile"),
+    system:
+      "You are a professional customer support agent. Improve the following reply to be clearer, more professional, and empathetic. Return only the improved reply text with no explanations, preamble, or formatting.",
+    prompt: body,
+  });
+
+  res.json({ body: text });
 });
 
 export default router;

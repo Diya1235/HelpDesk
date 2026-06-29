@@ -120,7 +120,10 @@ router.delete("/:id", async (req, res) => {
     return;
   }
 
-  await db.user.delete({ where: { id } });
+  await db.$transaction([
+    db.ticket.updateMany({ where: { assignedToId: id }, data: { assignedToId: null } }),
+    db.user.delete({ where: { id } }),
+  ]);
   res.status(204).send();
 });
 
