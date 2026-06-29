@@ -1,3 +1,11 @@
+import * as Sentry from "@sentry/node";
+
+Sentry.init({
+  dsn: process.env["SENTRY_DSN"],
+  environment: process.env["NODE_ENV"] ?? "development",
+  enabled: !!process.env["SENTRY_DSN"],
+});
+
 import express from "express";
 import cors from "cors";
 import { rateLimit } from "express-rate-limit";
@@ -37,7 +45,10 @@ if (process.env["NODE_ENV"] === "production") {
     })
   );
 }
+app.get('/debug-sentry',(req,res)=>{
+  throw new Error('failed');
 
+});
 const allowedOrigins: (string | RegExp)[] = [
   /^http:\/\/localhost(:\d+)?$/,
 ];
@@ -71,7 +82,7 @@ app.get("/me", requireAuth, (req, res) => {
   res.json({ user: req.user, session: req.session });
 });
 
-app.get("/health", async (_req, res) => {
+app.get("/api/health", async (_req, res) => {
   try {
     await db.$queryRaw`SELECT 1`;
     res.json({ status: "ok", db: "connected" });
@@ -80,6 +91,7 @@ app.get("/health", async (_req, res) => {
   }
 });
 
+Sentry.setupExpressErrorHandler(app);
 app.use(errorHandler);
 
 app.listen(PORT, async () => {

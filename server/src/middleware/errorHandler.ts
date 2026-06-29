@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import type { ErrorRequestHandler } from "express";
 import { Prisma } from "../generated/prisma";
 
@@ -9,6 +10,7 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     res.status(404).json({ error: "Not found" });
     return;
   }
+  Sentry.captureException(err);
   console.error(err);
   res.status(500).json({ error: "Internal server error" });
 };
