@@ -1,5 +1,7 @@
-FROM oven/bun:1 AS builder
+FROM oven/bun:1.2 AS builder
 WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies (workspace-aware)
 COPY package.json bun.lock ./
@@ -18,8 +20,10 @@ RUN cd client && bun run build
 RUN cd server && bunx prisma generate
 
 # ── Production image ──────────────────────────────────────────────────────────
-FROM oven/bun:1
+FROM oven/bun:1.2
 WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
